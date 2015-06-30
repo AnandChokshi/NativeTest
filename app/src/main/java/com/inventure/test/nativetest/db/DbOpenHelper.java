@@ -58,12 +58,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     PAGE_ORDER + " INTEGER, " +
                     QUESTIONS_ID + " INTEGER, " +
                     ANSWER + " TEXT, " +
-                    STATUS + "INTEGER" +
+                    STATUS + " INTEGER" +
                     ")";
     private static final String QUESTIONS_TABLE_CREATE =
             "CREATE TABLE " + QUESTIONS_TABLE_NAME + " (" +
                     QUESTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    PAGE_ID + "INTEGER, " +
+                    PAGE_ID + " INTEGER, " +
                     QUESTIONS_SERVER_ID + " INTEGER, " +
                     TYPE + " NUMERIC, " +
                     LABEL + " TEXT, " +

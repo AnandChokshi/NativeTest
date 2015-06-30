@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Page {
     int page_id;
     int page_order;
-    ArrayList<QuestionMod> questions;
+    ArrayList<Question> questions;
     Condition condition;
     int status;
 
@@ -28,11 +28,11 @@ public class Page {
         this.page_order = page_order;
     }
 
-    public ArrayList<QuestionMod> getQuestions() {
+    public ArrayList<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(ArrayList<QuestionMod> questions) {
+    public void setQuestions(ArrayList<Question> questions) {
         this.questions = questions;
     }
 

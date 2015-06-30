@@ -5,7 +5,7 @@ import android.content.Context;
 import com.inventure.test.nativetest.db.DbDataSource;
 import com.inventure.test.nativetest.model.Condition;
 import com.inventure.test.nativetest.model.Page;
-import com.inventure.test.nativetest.model.QuestionMod;
+import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
 
 import org.json.JSONArray;
@@ -55,33 +55,33 @@ public class JsonReader {
     }
 
     // Read all questions from the page
-    private ArrayList<QuestionMod> readFromQuestionJSON(JSONArray jsonArray) throws JSONException {
-        ArrayList<QuestionMod> questionMods = new ArrayList<>();
+    private ArrayList<Question> readFromQuestionJSON(JSONArray jsonArray) throws JSONException {
+        ArrayList<Question> questions = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            QuestionMod questionMod = new QuestionMod();
+            Question question = new Question();
             JSONObject object = jsonArray.getJSONObject(i);
 
-            questionMod.setQuestion_server_id(object.getInt("question_server_id"));
+            question.setQuestion_server_id(object.getInt("question_server_id"));
             String type = object.getString("type");
-            questionMod.setType(type);
-            questionMod.setLabel(object.getString("label"));
+            question.setType(type);
+            question.setLabel(object.getString("label"));
 
             if (type.equals("textbox") || type.equals("textarea"))
-                questionMod.setPlaceHolder(object.getString("placeholder"));
+                question.setPlaceHolder(object.getString("placeholder"));
 
             if (object.getJSONArray("default").length() > 0) {
-                questionMod.setDefaultValues(readDefaultValues(object.getJSONArray("default")));
+                question.setDefaultValues(readDefaultValues(object.getJSONArray("default")));
             }
 
-            questionMod.setValidation(readValidationValues(object.getJSONObject("validation")));
+            question.setValidation(readValidationValues(object.getJSONObject("validation")));
 
             if (type.equals("radio") || type.equals("spinner") || type.equals("checkbox"))
-                questionMod.setOptions(readFromOptions(object.getJSONArray("options")));
+                question.setOptions(readFromOptions(object.getJSONArray("options")));
 
-            questionMods.add(questionMod);
+            questions.add(question);
         }
 
-        return questionMods;
+        return questions;
     }
 
     // Read default values
