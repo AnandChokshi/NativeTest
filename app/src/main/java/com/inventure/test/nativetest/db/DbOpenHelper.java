@@ -10,40 +10,87 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DbOpenHelper extends SQLiteOpenHelper {
 
     // db name
-    private static final String DB_NAME = "questions.db";
+    private static final String DB_NAME = "native.db";
 
     // Version
     private static final int DB_VERSION = 1;
 
-    // Name of the table Questions Column
+    // Name of the tables
+    public static final String PAGE_TABLE_NAME = "page";
     public static final String QUESTIONS_TABLE_NAME = "questions";
-    public static final String QUE_ID = "que_id";
-    public static final String Q_ID = "qid";
-    public static final String QUESTION = "question";
+    public static final String OPTIONS_TABLE_NAME = "options";
+    public static final String DEFAULT_VALUES_TABLE_NAME = "default_values";
+    public static final String VALIDATION_TABLE_NAME = "validation";
+
+    // Page table Columns
+    public static final String PAGE_ID = "page_id";
+    public static final String PAGE_ORDER = "page_order";
+    public static final String STATUS = "status";
+
+    // Questions table Columns
+    public static final String QUESTIONS_ID = "questions_id";
+    public static final String QUESTIONS_SERVER_ID = "questions_server_id";
     public static final String TYPE = "type";
+    public static final String LABEL = "label";
+    public static final String PLACEHOLDER = "placeholder";
     public static final String ANSWER = "answer";
 
-    // Name of the table Options Column
-    public static final String OPTIONS_TABLE_NAME = "options";
-    public static final String O_ID = "oid";
-    public static final String CONTENT = "content";
+    // Options table Columns
+    public static final String OPTIONS_ID = "options_id";
+    public static final String OPTION = "option";
+
+    // Default Values table Columns
+    public static final String DEFAULT_VALUES_ID = "default_values_id";
+    public static final String VALUE = "value";
+
+    // Validation table Columns
+    public static final String VALIDATION_ID = "validation_id";
+    public static final String REQUIRED = "requried";
+    public static final String VALIDATION_TYPE = "validation_type";
+    public static final String REGEX = "regex";
+    public static final String ERROR_MESSAGE = "error_message";
 
 
     // Query to Create both tables
+    private static final String PAGE_TABLE_CREATE =
+            "CREATE TABLE " + PAGE_TABLE_NAME + " (" +
+                    PAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    PAGE_ORDER + " INTEGER, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    ANSWER + " TEXT, " +
+                    STATUS + "INTEGER" +
+                    ")";
     private static final String QUESTIONS_TABLE_CREATE =
             "CREATE TABLE " + QUESTIONS_TABLE_NAME + " (" +
-                    QUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    Q_ID + " INTEGER, " +
-                    QUESTION + " TEXT, " +
+                    QUESTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    PAGE_ID + "INTEGER, " +
+                    QUESTIONS_SERVER_ID + " INTEGER, " +
                     TYPE + " NUMERIC, " +
-                    ANSWER + " TEXT " +
-                    ")";
+                    LABEL + " TEXT, " +
+                    PLACEHOLDER + " TEXT, " +
+                    ANSWER + " TEXT, " +
+                    "FOREIGN KEY(" + PAGE_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + PAGE_ID + "))";
     private static final String OPTIONS_TABLE_CREATE =
             "CREATE TABLE " + OPTIONS_TABLE_NAME + " (" +
-                    O_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    QUE_ID + " INTEGER, " +
-                    CONTENT + " TEXT, " +
-                    "FOREIGN KEY(" + QUE_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUE_ID + "))";
+                    OPTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    OPTION + " TEXT, " +
+                    "FOREIGN KEY(" + QUESTIONS_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUESTIONS_ID + "))";
+    private static final String DEFAULT_VALUES_TABLE_CREATE =
+            "CREATE TABLE " + DEFAULT_VALUES_TABLE_NAME + " (" +
+                    DEFAULT_VALUES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    VALUE + " TEXT, " +
+                    "FOREIGN KEY(" + QUESTIONS_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUESTIONS_ID + "))";
+    private static final String VALIDATION_TABLE_CREATE =
+            "CREATE TABLE " + VALIDATION_TABLE_NAME + " (" +
+                    VALIDATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    REQUIRED + " INTEGER, " +
+                    VALIDATION_TYPE + " TEXT, " +
+                    REGEX + " TEXT, " +
+                    ERROR_MESSAGE + " TEXT, " +
+                    "FOREIGN KEY(" + QUESTIONS_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUESTIONS_ID + "))";
 
 
     public DbOpenHelper(Context context) {
@@ -53,13 +100,19 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(QUESTIONS_TABLE_CREATE);
+        db.execSQL(PAGE_TABLE_CREATE);
         db.execSQL(OPTIONS_TABLE_CREATE);
+        db.execSQL(DEFAULT_VALUES_TABLE_CREATE);
+        db.execSQL(VALIDATION_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + QUESTIONS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PAGE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + OPTIONS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DEFAULT_VALUES_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + VALIDATION_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + QUESTIONS_TABLE_NAME);
         onCreate(db);
     }
 }
