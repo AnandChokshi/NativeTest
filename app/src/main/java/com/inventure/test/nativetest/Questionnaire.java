@@ -3,11 +3,14 @@ package com.inventure.test.nativetest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.inventure.test.nativetest.db.DbDataSource;
 import com.inventure.test.nativetest.model.Page;
+import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.util.UIHelper;
 
 
@@ -34,9 +37,20 @@ public class Questionnaire extends Activity {
         page = dbDataSource.readPage();
         dbDataSource.close();
 
-        uiHelper = new UIHelper(this);
+        uiHelper = new UIHelper(this, page.getQuestions(), linearLayout);
 
-        uiHelper.loadView(linearLayout, page.getQuestions());
+        uiHelper.loadView();
+        next = new Button(this);
+        next.setText("NEXT");
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                page.setQuestions(uiHelper.getAnswers());
+                for (Question question : page.getQuestions()) {
+                    Log.d("TEXT", question.getAnswer() + "\n");
+                }
+            }
+        });
     }
 
     @Override

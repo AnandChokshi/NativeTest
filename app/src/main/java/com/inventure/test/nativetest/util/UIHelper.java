@@ -1,6 +1,8 @@
 package com.inventure.test.nativetest.util;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -16,22 +18,28 @@ import java.util.ArrayList;
  */
 public class UIHelper {
     private Context context;
+    private ArrayList<Question> questions;
+    private LinearLayout linearLayout;
 
-    public UIHelper(Context context) {
+    public UIHelper(Context context, ArrayList<Question> questions, LinearLayout linearLayout) {
         this.context = context;
+        this.questions = questions;
+        this.linearLayout = linearLayout;
     }
 
-    public void loadView(LinearLayout linearLayout, ArrayList<Question> questions) {
+    public void loadView() {
+        int position = 0;
         for (Question question : questions) {
             makeTextView(question, linearLayout);
             switch (question.getType()) {
                 case "textbox":
-                    makeTextBox(question, linearLayout);
+                    makeTextBox(linearLayout, position);
                     break;
                 case "radio":
-                    makeRadio(question, linearLayout);
+                    makeRadio(question, linearLayout, position);
                     break;
             }
+            position++;
         }
     }
 
@@ -42,13 +50,15 @@ public class UIHelper {
         linearLayout.addView(textView);
     }
 
-    private void makeTextBox(Question question, LinearLayout linearLayout) {
+    private void makeTextBox(LinearLayout linearLayout, int position) {
         //Initialize EditText
         EditText editText = new EditText(context);
+        MyTextWatcher myTextWatcher = new MyTextWatcher(position);
+        editText.addTextChangedListener(myTextWatcher);
         linearLayout.addView(editText);
     }
 
-    private void makeRadio(Question question, LinearLayout linearLayout) {
+    private void makeRadio(Question question, LinearLayout linearLayout, int position) {
         int id_counter_radio = 1;
 
         // Initialize RadioGroup
@@ -69,5 +79,32 @@ public class UIHelper {
             id_counter_radio++;
         }
         linearLayout.addView(radioGroup);
+    }
+
+    // To store the answers of edit box
+    private class MyTextWatcher implements TextWatcher {
+        private int position;
+
+        private MyTextWatcher(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            questions.get(position).setAnswer(s.toString());
+        }
+    }
+
+    // To get the answers
+    public ArrayList<Question> getAnswers() {
+        return questions;
     }
 }
