@@ -5,7 +5,10 @@ package com.inventure.test.nativetest.util;
  */
 public class QuestionType {
 
-    public static final int RADIO = 1;
-    public static final int EDIT_TEXT = 2;
-    public static final int CHECKBOX = 3;
+    public static final String RADIO = "radio";
+    public static final String TEXT_BOX = "textbox";
+    public static final String TEXT_AREA = "textarea";
+    public static final String CHECKBOX = "checkbox";
+    public static final String SPINNER = "spinner";
+    public static final String DATEPICKER = "datepicker";
 }

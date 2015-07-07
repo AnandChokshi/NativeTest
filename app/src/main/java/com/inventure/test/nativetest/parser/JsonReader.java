@@ -7,6 +7,7 @@ import com.inventure.test.nativetest.model.Condition;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
+import com.inventure.test.nativetest.util.QuestionType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +67,7 @@ public class JsonReader {
             question.setType(type);
             question.setLabel(object.getString("label"));
 
-            if (type.equals("textbox") || type.equals("textarea"))
+            if (type.equals(QuestionType.TEXT_BOX) || type.equals(QuestionType.TEXT_AREA))
                 question.setPlaceHolder(object.getString("placeholder"));
 
             if (object.getJSONArray("default").length() > 0) {
@@ -75,7 +76,7 @@ public class JsonReader {
 
             question.setValidation(readValidationValues(object.getJSONObject("validation")));
 
-            if (type.equals("radio") || type.equals("spinner") || type.equals("checkbox"))
+            if (type.equals(QuestionType.RADIO) || type.equals(QuestionType.SPINNER) || type.equals(QuestionType.CHECKBOX))
                 question.setOptions(readFromOptions(object.getJSONArray("options")));
 
             questions.add(question);

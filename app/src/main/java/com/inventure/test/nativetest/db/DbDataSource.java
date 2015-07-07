@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
+import com.inventure.test.nativetest.util.QuestionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class DbDataSource {
             contentValues.put(DbOpenHelper.TYPE, type);
             contentValues.put(DbOpenHelper.LABEL, question.getLabel());
 
-            if (type.equals("textbox") || type.equals("textarea"))
+            if (type.equals(QuestionType.TEXT_BOX) || type.equals(QuestionType.TEXT_AREA))
                 contentValues.put(DbOpenHelper.PLACEHOLDER, question.getPlaceHolder());
 
             contentValues.put(DbOpenHelper.ANSWER, "Empty");
@@ -80,7 +81,7 @@ public class DbDataSource {
             insertValidation(que_id, question.getValidation());
 
             // IF questions have options then insert them in options table
-            if (type.equals("radio") || type.equals("spinner") || type.equals("checkbox"))
+            if (type.equals(QuestionType.RADIO) || type.equals(QuestionType.SPINNER) || type.equals(QuestionType.CHECKBOX))
                 insertOptions(que_id, question.getOptions());
 
             // clear current question values
@@ -128,45 +129,55 @@ public class DbDataSource {
 
     // Read Page by checking condition and status
     public Page readPage() {
-        String query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
-                DbOpenHelper.STATUS + " = 0 LIMIT 1";
-
-        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        int page_id;
         Page page = new Page();
+        boolean loop = true;
 
-        if (cursor.moveToNext()) {
-            page_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.PAGE_ID));
-            int question_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_ID));
+        while (loop) {
+            String query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
+                    DbOpenHelper.STATUS + " = 0 LIMIT 1";
 
-            // if question_id is zero then load the page otherwise check condition
-            if (question_id != 0) {
-                // Check that page satisfies the condition
-                query = "SELECT * FROM " + DbOpenHelper.QUESTIONS_TABLE_NAME + " WHERE " +
-                        DbOpenHelper.QUESTIONS_ID + " = " + question_id + " AND " +
-                        DbOpenHelper.ANSWER + " = " + cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER));
+            Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+            int page_id;
 
-                cursor = sqLiteDatabase.rawQuery(query, null);
+            if (cursor.moveToNext()) {
+                page_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.PAGE_ID));
+                int question_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_ID));
 
-                // if condition satisfies then load the page otherwise change the status and call method again
-                if (!cursor.moveToNext()) {
-                    ContentValues values = new ContentValues();
-                    values.put(DbOpenHelper.STATUS, 1);
-                    sqLiteDatabase.update(DbOpenHelper.PAGE_TABLE_NAME, values, DbOpenHelper.PAGE_ID + " = ?",
-                            new String[]{String.valueOf(page_id)});
+                // if question_id is zero then load the page otherwise check condition
+                if (question_id != 0) {
+                    // Check that page satisfies the condition
+                    query = "SELECT * FROM " + DbOpenHelper.QUESTIONS_TABLE_NAME + " WHERE " +
+                            DbOpenHelper.QUESTIONS_ID + " = " + question_id + " AND " +
+                            DbOpenHelper.ANSWER + " = '" + cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER)) + "'";
 
-                    cursor.close();
-                    readPage();
+//                    try {
+                    Cursor temp = sqLiteDatabase.rawQuery(query, null);
+                    temp.close();
+                    cursor = sqLiteDatabase.rawQuery(query, null);
+//                    } catch (Exception e) {
+//                        // Column not found
+//                    }
+
+                    // if condition satisfies then load the page otherwise change the status and call method again
+                    if (!cursor.moveToNext()) {
+                        ContentValues values = new ContentValues();
+                        values.put(DbOpenHelper.STATUS, 1);
+                        sqLiteDatabase.update(DbOpenHelper.PAGE_TABLE_NAME, values, DbOpenHelper.PAGE_ID + " = ?",
+                                new String[]{String.valueOf(page_id)});
+
+                        cursor.close();
+                        continue;
+                    } else {
+                        loadPage(page_id, page);
+                    }
                 } else {
                     loadPage(page_id, page);
                 }
-            } else {
-                loadPage(page_id, page);
+                page.setPage_id(page_id);
+                loop = false;
             }
-            page.setPage_id(page_id);
+            cursor.close();
         }
-
-        cursor.close();
         return page;
     }
 
@@ -235,10 +246,18 @@ public class DbDataSource {
         questions.add(question);
     }
 
-//    public void insertAnswer(int qId, String answer) {
-//        ContentValues values = new ContentValues();
-//        values.put(DbOpenHelper.ANSWER, answer);
-//        sqLiteDatabase.update(DbOpenHelper.QUESTIONS_TABLE_NAME, values, DbOpenHelper.ID + " = ?",
-//                new String[]{String.valueOf(qId)});
-//    }
+    public void insertAnswer(Page page) {
+        ContentValues values;
+        for (Question question : page.getQuestions()) {
+            values = new ContentValues();
+            values.put(DbOpenHelper.ANSWER, question.getAnswer());
+
+            sqLiteDatabase.update(DbOpenHelper.QUESTIONS_TABLE_NAME, values, DbOpenHelper.QUESTIONS_ID + " = ?",
+                    new String[]{String.valueOf(question.getQuestion_id())});
+        }
+        values = new ContentValues();
+        values.put(DbOpenHelper.STATUS, 1);
+        sqLiteDatabase.update(DbOpenHelper.PAGE_TABLE_NAME, values, DbOpenHelper.PAGE_ID + " = ?",
+                new String[]{String.valueOf(page.getPage_id())});
+    }
 }

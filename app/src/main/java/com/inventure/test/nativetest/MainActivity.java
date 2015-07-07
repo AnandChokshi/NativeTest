@@ -12,6 +12,11 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.inventure.test.nativetest.parser.JsonReader;
+import com.inventure.test.nativetest.testUtil.JsonCreator;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 
 public class MainActivity extends Activity {
@@ -48,15 +53,15 @@ public class MainActivity extends Activity {
             }
         });
 
-        //Reads data from test json and load it into database
-//        try {
-//            JSONArray jsonArray = JsonCreator.getJsonArray();
-//            JsonReader jsonReader = new JsonReader(this);
-//            jsonReader.readDataFromJSON(jsonArray);
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        // Reads data from test json and load it into database
+        try {
+            JSONArray jsonArray = JsonCreator.getJsonArray();
+            JsonReader jsonReader = new JsonReader(this);
+            jsonReader.readDataFromJSON(jsonArray);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
         startActivity(questionnaire);
     }
