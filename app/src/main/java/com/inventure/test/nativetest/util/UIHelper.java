@@ -118,24 +118,14 @@ public class UIHelper {
     }
 
     private void makeDatePicker(LinearLayout linearLayout, final int position) {
-        final EditText selectDate = new EditText(context);
-        selectDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        EditText selectDate = new EditText(context);
 
-            }
-        });
-
+        CustomDateSetListener customDateSetListener = new CustomDateSetListener(position, selectDate);
         Calendar newCalendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
-                Calendar newDate = Calendar.getInstance();
-                newDate.set(year, monthOfYear, dayOfMonth);
-                selectDate.setText(dateFormatter.format(newDate.getTime()));
-                questions.get(position).setAnswer(dateFormatter.format(newDate.getTime()));
-            }
-        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(context, customDateSetListener, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+        CustomOnClickListener customOnClickListener = new CustomOnClickListener(datePickerDialog);
+        selectDate.setOnClickListener(customOnClickListener);
 
         linearLayout.addView(selectDate);
     }
@@ -182,7 +172,6 @@ public class UIHelper {
         questions.get(position).setAnswer(radioButton.getText().toString());
     }
 
-
     // To Store answer of Checkbox
     private class CustomCheckboxChangedListener implements CheckBox.OnCheckedChangeListener {
         private int position;
@@ -196,6 +185,40 @@ public class UIHelper {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             getCheckedCheckbox(position, value, isChecked);
+        }
+    }
+
+    // To call the date picker
+    private class CustomOnClickListener implements EditText.OnClickListener {
+        DatePickerDialog datePickerDialog;
+
+        private CustomOnClickListener(DatePickerDialog datePickerDialog) {
+            this.datePickerDialog = datePickerDialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            datePickerDialog.show();
+        }
+    }
+
+    // Date picker custom listener
+    private class CustomDateSetListener implements DatePickerDialog.OnDateSetListener {
+        private int position;
+        private EditText editText;
+
+        private CustomDateSetListener(int position, EditText editText) {
+            this.position = position;
+            this.editText = editText;
+        }
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+            Calendar newDate = Calendar.getInstance();
+            newDate.set(year, monthOfYear, dayOfMonth);
+            editText.setText(dateFormatter.format(newDate.getTime()));
+            questions.get(position).setAnswer(dateFormatter.format(newDate.getTime()));
         }
     }
 
