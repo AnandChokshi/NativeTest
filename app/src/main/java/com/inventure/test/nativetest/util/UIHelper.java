@@ -38,7 +38,7 @@ public class UIHelper {
         this.linearLayout = linearLayout;
     }
 
-    // TO DO: Time Picker, Text Area, Spinner
+    // TO DO: Text Area, Spinner
 
     public void loadView() {
         int position = 0;
@@ -46,7 +46,10 @@ public class UIHelper {
             makeTextView(question, linearLayout);
             switch (question.getType()) {
                 case QuestionType.TEXT_BOX:
-                    makeTextBox(linearLayout, position);
+                    makeTextBox(linearLayout, position, question.getType());
+                    break;
+                case QuestionType.TEXT_AREA:
+                    makeTextBox(linearLayout, position, question.getType());
                     break;
                 case QuestionType.RADIO:
                     makeRadio(question, linearLayout, position);
@@ -72,9 +75,11 @@ public class UIHelper {
         linearLayout.addView(textView);
     }
 
-    private void makeTextBox(LinearLayout linearLayout, int position) {
+    private void makeTextBox(LinearLayout linearLayout, int position, String type) {
         //Initialize EditText
         EditText editText = new EditText(context);
+        if (type.equals("textbox"))
+            editText.setSingleLine(true);
         CustomTextWatcher customTextWatcher = new CustomTextWatcher(position);
         editText.addTextChangedListener(customTextWatcher);
         linearLayout.addView(editText);
