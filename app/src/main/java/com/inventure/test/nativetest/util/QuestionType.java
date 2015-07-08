@@ -11,4 +11,5 @@ public class QuestionType {
     public static final String CHECKBOX = "checkbox";
     public static final String SPINNER = "spinner";
     public static final String DATEPICKER = "datepicker";
+    public static final String TIMEPICKER = "timepicker";
 }

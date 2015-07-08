@@ -1,6 +1,7 @@
 package com.inventure.test.nativetest.util;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.inventure.test.nativetest.model.Question;
 
@@ -36,6 +38,8 @@ public class UIHelper {
         this.linearLayout = linearLayout;
     }
 
+    // TO DO: Time Picker, Text Area, Spinner
+
     public void loadView() {
         int position = 0;
         for (Question question : questions) {
@@ -52,6 +56,9 @@ public class UIHelper {
                     break;
                 case QuestionType.DATEPICKER:
                     makeDatePicker(linearLayout, position);
+                    break;
+                case QuestionType.TIMEPICKER:
+                    makeTimePicker(linearLayout, position);
                     break;
             }
             position++;
@@ -117,17 +124,32 @@ public class UIHelper {
         }
     }
 
-    private void makeDatePicker(LinearLayout linearLayout, final int position) {
+    private void makeDatePicker(LinearLayout linearLayout, int position) {
         EditText selectDate = new EditText(context);
 
         CustomDateSetListener customDateSetListener = new CustomDateSetListener(position, selectDate);
         Calendar newCalendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(context, customDateSetListener, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(context, customDateSetListener,
+                newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
 
-        CustomOnClickListener customOnClickListener = new CustomOnClickListener(datePickerDialog);
-        selectDate.setOnClickListener(customOnClickListener);
+        CustomDateOnClickListener customDateOnClickListener = new CustomDateOnClickListener(datePickerDialog);
+        selectDate.setOnClickListener(customDateOnClickListener);
 
         linearLayout.addView(selectDate);
+    }
+
+    private void makeTimePicker(LinearLayout linearLayout, int position) {
+        EditText selectTime = new EditText(context);
+
+        CustomTimeSetListener customTimeSetListener = new CustomTimeSetListener(position, selectTime);
+        Calendar newTime = Calendar.getInstance();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context, customTimeSetListener,
+                newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), true);
+
+        CustomTimeOnClickListener customTimeOnClickListener = new CustomTimeOnClickListener(timePickerDialog);
+        selectTime.setOnClickListener(customTimeOnClickListener);
+
+        linearLayout.addView(selectTime);
     }
 
     // To store the answers of edit box
@@ -189,10 +211,10 @@ public class UIHelper {
     }
 
     // To call the date picker
-    private class CustomOnClickListener implements EditText.OnClickListener {
+    private class CustomDateOnClickListener implements EditText.OnClickListener {
         DatePickerDialog datePickerDialog;
 
-        private CustomOnClickListener(DatePickerDialog datePickerDialog) {
+        private CustomDateOnClickListener(DatePickerDialog datePickerDialog) {
             this.datePickerDialog = datePickerDialog;
         }
 
@@ -219,6 +241,37 @@ public class UIHelper {
             newDate.set(year, monthOfYear, dayOfMonth);
             editText.setText(dateFormatter.format(newDate.getTime()));
             questions.get(position).setAnswer(dateFormatter.format(newDate.getTime()));
+        }
+    }
+
+    // To call the time picker
+    private class CustomTimeOnClickListener implements EditText.OnClickListener {
+        TimePickerDialog timePickerDialog;
+
+        private CustomTimeOnClickListener(TimePickerDialog timePickerDialog) {
+            this.timePickerDialog = timePickerDialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            timePickerDialog.show();
+        }
+    }
+
+    // Time picker custom listener
+    private class CustomTimeSetListener implements TimePickerDialog.OnTimeSetListener {
+        private int position;
+        private EditText editText;
+
+        private CustomTimeSetListener(int position, EditText editText) {
+            this.position = position;
+            this.editText = editText;
+        }
+
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            editText.setText(String.valueOf(hourOfDay + ":" + minute));
+            questions.get(position).setAnswer(String.valueOf(hourOfDay + ":" + minute));
         }
     }
 
