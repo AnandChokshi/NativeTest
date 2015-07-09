@@ -6,6 +6,8 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -13,6 +15,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -62,6 +65,9 @@ public class UIHelper {
                     break;
                 case QuestionType.TIMEPICKER:
                     makeTimePicker(linearLayout, position);
+                    break;
+                case QuestionType.SPINNER:
+                    makeSpinner(question, linearLayout, position);
                     break;
             }
             position++;
@@ -155,6 +161,19 @@ public class UIHelper {
         selectTime.setOnClickListener(customTimeOnClickListener);
 
         linearLayout.addView(selectTime);
+    }
+
+    private void makeSpinner(Question question, LinearLayout linearLayout, int position) {
+        Spinner spinner = new Spinner(context);
+        CustomOnItemSelectedListener customOnItemSelectedListener = new CustomOnItemSelectedListener(position);
+        spinner.setOnItemSelectedListener(customOnItemSelectedListener);
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_item, question.getOptions());
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
+
+        linearLayout.addView(spinner);
     }
 
     // To store the answers of edit box
@@ -290,6 +309,24 @@ public class UIHelper {
             }
         }
         questions.get(position).setAnswer(sb.toString());
+    }
+
+    private class CustomOnItemSelectedListener implements Spinner.OnItemSelectedListener {
+        int position;
+
+        private CustomOnItemSelectedListener(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            questions.get(this.position).setAnswer(parent.getItemAtPosition(position).toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
     }
 
     // To get the answers
