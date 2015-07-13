@@ -150,13 +150,7 @@ public class DbDataSource {
                             DbOpenHelper.QUESTIONS_ID + " = " + question_id + " AND " +
                             DbOpenHelper.ANSWER + " = '" + cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER)) + "'";
 
-//                    try {
-                    Cursor temp = sqLiteDatabase.rawQuery(query, null);
-                    temp.close();
                     cursor = sqLiteDatabase.rawQuery(query, null);
-//                    } catch (Exception e) {
-//                        // Column not found
-//                    }
 
                     // if condition satisfies then load the page otherwise change the status and call method again
                     if (!cursor.moveToNext()) {

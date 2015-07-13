@@ -20,7 +20,6 @@ import java.util.ArrayList;
  */
 public class JsonReader {
     private Context context;
-    private DbDataSource dbDataSource;
     private ArrayList<Page> pages;
 
     public JsonReader(Context context) {
@@ -29,7 +28,7 @@ public class JsonReader {
 
     /*
     Name of the tags are hardcoded right now for ease of use
-    later we can change it
+    as this is not the final version
      */
     public void readDataFromJSON(JSONArray jsonArray) throws JSONException {
         pages = new ArrayList<>();
@@ -117,7 +116,7 @@ public class JsonReader {
     }
 
     private void insertInDatabase() {
-        dbDataSource = new DbDataSource(context);
+        DbDataSource dbDataSource = new DbDataSource(context);
         dbDataSource.open();
         dbDataSource.insertJSON(pages);
         dbDataSource.close();

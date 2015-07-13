@@ -41,8 +41,6 @@ public class UIHelper {
         this.linearLayout = linearLayout;
     }
 
-    // TO DO: Text Area, Spinner
-
     public void loadView() {
         int position = 0;
         for (Question question : questions) {
@@ -84,6 +82,8 @@ public class UIHelper {
     private void makeTextBox(LinearLayout linearLayout, int position, String type) {
         //Initialize EditText
         EditText editText = new EditText(context);
+
+        // set properties according to Edit text type
         if (type.equals("textbox"))
             editText.setSingleLine(true);
         CustomTextWatcher customTextWatcher = new CustomTextWatcher(position);
