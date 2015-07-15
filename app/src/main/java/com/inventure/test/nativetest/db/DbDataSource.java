@@ -40,9 +40,8 @@ public class DbDataSource {
         ContentValues contentValues = new ContentValues();
 
         for (Page page : pages) {
-            contentValues.put(DbOpenHelper.PAGE_ORDER, page.getPage_order());
-            contentValues.put(DbOpenHelper.QUESTIONS_ID, page.getCondition().getQid());
-            contentValues.put(DbOpenHelper.ANSWER, page.getCondition().getAnswer());
+            //  contentValues.put(DbOpenHelper.QUESTIONS_ID, page.getCondition().getQid());
+            // contentValues.put(DbOpenHelper.ANSWER, page.getCondition().getAnswer());
             contentValues.put(DbOpenHelper.STATUS, 0);
 
             long page_id = sqLiteDatabase.insert(DbOpenHelper.PAGE_TABLE_NAME, null, contentValues);

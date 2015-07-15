@@ -100,8 +100,8 @@ public class MainActivity extends Activity implements
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
-//        startActivity(questionnaire);
+        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
+        startActivity(questionnaire);
     }
 
     // Facebook Login Button Call Back

@@ -16,16 +16,23 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
 
     // Name of the tables
+    public static final String SECTION_TABLE_NAME = "section";
     public static final String PAGE_TABLE_NAME = "page";
     public static final String QUESTIONS_TABLE_NAME = "questions";
     public static final String OPTIONS_TABLE_NAME = "options";
     public static final String DEFAULT_VALUES_TABLE_NAME = "default_values";
     public static final String VALIDATION_TABLE_NAME = "validation";
+    public static final String PAGE_CONDITION_TABLE_NAME = "page_condition";
+    public static final String SECTION_CONDITION_TABLE_NAME = "section_condition";
+
+    // Section table Columns
+    public static final String SECTION_ID = "section_id";
+    public static final String CONFIRMATION = "confirmation";
+    public static final String CONDITION = "condition";
+    public static final String STATUS = "status";
 
     // Page table Columns
     public static final String PAGE_ID = "page_id";
-    public static final String PAGE_ORDER = "page_order";
-    public static final String STATUS = "status";
 
     // Questions table Columns
     public static final String QUESTIONS_ID = "questions_id";
@@ -50,16 +57,24 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     public static final String REGEX = "regex";
     public static final String ERROR_MESSAGE = "error_message";
 
+    // Condition tables Columns
+    public static final String CONDITION_ID = "condition_id";
 
     // Query to Create both tables
+    private static final String SECTION_TABLE_CREATE =
+            "CREATE TABLE " + SECTION_TABLE_NAME + " (" +
+                    SECTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    CONFIRMATION + " INTEGER, " +
+                    CONDITION + " INTEGER, " +
+                    STATUS + " INTEGER" +
+                    ")";
     private static final String PAGE_TABLE_CREATE =
             "CREATE TABLE " + PAGE_TABLE_NAME + " (" +
                     PAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    PAGE_ORDER + " INTEGER, " +
-                    QUESTIONS_ID + " INTEGER, " +
-                    ANSWER + " TEXT, " +
-                    STATUS + " INTEGER" +
-                    ")";
+                    SECTION_ID + " INTEGER, " +
+                    CONDITION + " INTEGER, " +
+                    STATUS + " INTEGER, " +
+                    "FOREIGN KEY(" + SECTION_ID + ") REFERENCES " + SECTION_TABLE_NAME + "(" + SECTION_ID + "))";
     private static final String QUESTIONS_TABLE_CREATE =
             "CREATE TABLE " + QUESTIONS_TABLE_NAME + " (" +
                     QUESTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -91,7 +106,20 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     REGEX + " TEXT, " +
                     ERROR_MESSAGE + " TEXT, " +
                     "FOREIGN KEY(" + QUESTIONS_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUESTIONS_ID + "))";
-
+    private static final String PAGE_CONDITION_TABLE_CREATE =
+            "CREATE TABLE " + PAGE_CONDITION_TABLE_NAME + " (" +
+                    CONDITION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    PAGE_ID + " INTEGER, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    ANSWER + " TEXT, " +
+                    "FOREIGN KEY(" + PAGE_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + PAGE_ID + "))";
+    private static final String SECTION_CONDITION_TABLE_CREATE =
+            "CREATE TABLE " + SECTION_CONDITION_TABLE_NAME + " (" +
+                    CONDITION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    SECTION_ID + " INTEGER, " +
+                    QUESTIONS_ID + " INTEGER, " +
+                    ANSWER + " TEXT, " +
+                    "FOREIGN KEY(" + PAGE_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + PAGE_ID + "))";
 
     public DbOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -99,20 +127,26 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(QUESTIONS_TABLE_CREATE);
+        db.execSQL(SECTION_TABLE_CREATE);
         db.execSQL(PAGE_TABLE_CREATE);
+        db.execSQL(QUESTIONS_TABLE_CREATE);
         db.execSQL(OPTIONS_TABLE_CREATE);
         db.execSQL(DEFAULT_VALUES_TABLE_CREATE);
         db.execSQL(VALIDATION_TABLE_CREATE);
+        db.execSQL(PAGE_CONDITION_TABLE_CREATE);
+        db.execSQL(SECTION_CONDITION_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + SECTION_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + PAGE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + OPTIONS_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DEFAULT_VALUES_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + VALIDATION_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + QUESTIONS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PAGE_CONDITION_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SECTION_CONDITION_TABLE_NAME);
         onCreate(db);
     }
 }

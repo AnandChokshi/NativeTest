@@ -4,8 +4,8 @@ package com.inventure.test.nativetest.model;
  * Created by Anand on 6/25/2015.
  */
 public class Condition {
-    String qid;
-    String answer;
+    private String qid;
+    private String answer;
 
     public String getQid() {
         return qid;

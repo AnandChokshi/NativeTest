@@ -36,8 +36,7 @@ public class JsonReader {
             JSONObject object = jsonArray.getJSONObject(i);
             Page page = new Page();
 
-            page.setPage_order(object.getInt("page_order"));
-            page.setCondition(readFromConditionJson(object.getJSONObject("condition")));
+            page.setConditions(readFromConditionJson(object.getJSONArray("condition")));
             page.setQuestions(readFromQuestionJSON(object.getJSONArray("questions")));
 
             pages.add(page);
@@ -46,17 +45,23 @@ public class JsonReader {
     }
 
     // Read Condition of the page
-    private Condition readFromConditionJson(JSONObject jsonObject) throws JSONException {
-        Condition condition = new Condition();
-        condition.setQid(jsonObject.getString("qid"));
-        condition.setAnswer(jsonObject.getString("answer"));
+    private ArrayList<Condition> readFromConditionJson(JSONArray jsonArray) throws JSONException {
+        Condition condition;
+        ArrayList<Condition> conditions = new ArrayList<>();
 
-        return condition;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            condition = new Condition();
+            condition.setQid(jsonArray.getJSONObject(i).getString("qid"));
+            condition.setAnswer(jsonArray.getJSONObject(i).getString("answer"));
+            conditions.add(condition);
+        }
+        return conditions;
     }
 
     // Read all questions from the page
     private ArrayList<Question> readFromQuestionJSON(JSONArray jsonArray) throws JSONException {
         ArrayList<Question> questions = new ArrayList<>();
+
         for (int i = 0; i < jsonArray.length(); i++) {
             Question question = new Question();
             JSONObject object = jsonArray.getJSONObject(i);

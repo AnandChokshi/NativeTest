@@ -6,11 +6,19 @@ import java.util.ArrayList;
  * Created by Anand on 6/25/2015.
  */
 public class Page {
-    int page_id;
-    int page_order;
-    ArrayList<Question> questions;
-    Condition condition;
-    int status;
+    private int section_id;
+    private int page_id;
+    private ArrayList<Question> questions;
+    private ArrayList<Condition> conditions;
+    private int status;
+
+    public int getSection_id() {
+        return section_id;
+    }
+
+    public void setSection_id(int section_id) {
+        this.section_id = section_id;
+    }
 
     public int getPage_id() {
         return page_id;
@@ -18,14 +26,6 @@ public class Page {
 
     public void setPage_id(int page_id) {
         this.page_id = page_id;
-    }
-
-    public int getPage_order() {
-        return page_order;
-    }
-
-    public void setPage_order(int page_order) {
-        this.page_order = page_order;
     }
 
     public ArrayList<Question> getQuestions() {
@@ -36,12 +36,12 @@ public class Page {
         this.questions = questions;
     }
 
-    public Condition getCondition() {
-        return condition;
+    public ArrayList<Condition> getConditions() {
+        return conditions;
     }
 
-    public void setCondition(Condition condition) {
-        this.condition = condition;
+    public void setConditions(ArrayList<Condition> conditions) {
+        this.conditions = conditions;
     }
 
     public int getStatus() {

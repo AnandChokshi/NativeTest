@@ -5,10 +5,10 @@ package com.inventure.test.nativetest.model;
  */
 public class Validation {
 
-    int required;
-    String validation_type;
-    String regex;
-    String error_message;
+    private int required;
+    private String validation_type;
+    private String regex;
+    private String error_message;
 
     public int getRequired() {
         return required;
