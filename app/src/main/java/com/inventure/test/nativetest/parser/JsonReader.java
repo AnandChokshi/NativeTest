@@ -6,6 +6,7 @@ import com.inventure.test.nativetest.db.DbDataSource;
 import com.inventure.test.nativetest.model.Condition;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
+import com.inventure.test.nativetest.model.Section;
 import com.inventure.test.nativetest.model.Validation;
 import com.inventure.test.nativetest.util.QuestionType;
 
@@ -20,7 +21,7 @@ import java.util.ArrayList;
  */
 public class JsonReader {
     private Context context;
-    private ArrayList<Page> pages;
+    private ArrayList<Section> sections;
 
     public JsonReader(Context context) {
         this.context = context;
@@ -31,17 +32,34 @@ public class JsonReader {
     as this is not the final version
      */
     public void readDataFromJSON(JSONArray jsonArray) throws JSONException {
-        pages = new ArrayList<>();
+        Section section;
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
-            Page page = new Page();
+            section = new Section();
+
+            section.setConditions(readFromConditionJson(object.getJSONArray("condition")));
+            section.setConfirmation(object.getInt("showconfirmation"));
+            section.setPages(readFromPageJson(object.getJSONArray("pages")));
+        }
+
+        insertInDatabase();
+    }
+
+    // Read from Page
+    private ArrayList<Page> readFromPageJson(JSONArray jsonArray) throws JSONException {
+        ArrayList<Page> pages = new ArrayList<>();
+        Page page;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            page = new Page();
 
             page.setConditions(readFromConditionJson(object.getJSONArray("condition")));
             page.setQuestions(readFromQuestionJSON(object.getJSONArray("questions")));
 
             pages.add(page);
         }
-        insertInDatabase();
+
+        return pages;
     }
 
     // Read Condition of the page
@@ -123,7 +141,7 @@ public class JsonReader {
     private void insertInDatabase() {
         DbDataSource dbDataSource = new DbDataSource(context);
         dbDataSource.open();
-        dbDataSource.insertJSON(pages);
+        dbDataSource.insertJSON(sections);
         dbDataSource.close();
     }
 }

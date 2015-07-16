@@ -119,7 +119,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     SECTION_ID + " INTEGER, " +
                     QUESTIONS_ID + " INTEGER, " +
                     ANSWER + " TEXT, " +
-                    "FOREIGN KEY(" + PAGE_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + PAGE_ID + "))";
+                    "FOREIGN KEY(" + SECTION_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + SECTION_ID + "))";
 
     public DbOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

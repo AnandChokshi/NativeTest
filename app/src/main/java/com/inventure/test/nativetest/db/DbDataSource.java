@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
+import com.inventure.test.nativetest.model.Section;
 import com.inventure.test.nativetest.model.Validation;
 import com.inventure.test.nativetest.util.QuestionType;
 
@@ -35,13 +36,20 @@ public class DbDataSource {
         sqLiteDatabase.close();
     }
 
+    // Insert Json into database
+    public void insertJSON(List<Section> sections) {
+        ContentValues contentValues = new ContentValues();
+
+        for (Section section : sections) {
+
+        }
+    }
+
     // Insert JSON into database
-    public void insertJSON(List<Page> pages) {
+    private void insertPages(List<Page> pages) {
         ContentValues contentValues = new ContentValues();
 
         for (Page page : pages) {
-            //  contentValues.put(DbOpenHelper.QUESTIONS_ID, page.getCondition().getQid());
-            // contentValues.put(DbOpenHelper.ANSWER, page.getCondition().getAnswer());
             contentValues.put(DbOpenHelper.STATUS, 0);
 
             long page_id = sqLiteDatabase.insert(DbOpenHelper.PAGE_TABLE_NAME, null, contentValues);
