@@ -34,7 +34,7 @@ public class Questionnaire extends Activity {
         // Get First Unanswered Page
         dbDataSource = new DbDataSource(this);
         dbDataSource.open();
-        page = dbDataSource.readPage();
+        //page = dbDataSource.readPage();
 
         uiHelper = new UIHelper(this, page.getQuestions(), linearLayout);
 

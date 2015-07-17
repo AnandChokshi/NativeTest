@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Question {
     private int question_id;
-    private int question_server_id;
+    private String question_server_id;
     private String type;
     private String label;
     private String answer;
@@ -24,11 +24,11 @@ public class Question {
         this.question_id = question_id;
     }
 
-    public int getQuestion_server_id() {
+    public String getQuestion_server_id() {
         return question_server_id;
     }
 
-    public void setQuestion_server_id(int question_server_id) {
+    public void setQuestion_server_id(String question_server_id) {
         this.question_server_id = question_server_id;
     }
 

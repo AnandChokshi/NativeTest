@@ -91,6 +91,8 @@ public class MainActivity extends Activity implements
         findViewById(R.id.sign_in_button).setOnClickListener(this);
 
         // ----------------- Google Ends --------------------
+
+
         // Reads data from test json and load it into database
         try {
             JSONArray jsonArray = JsonCreator.getJsonArray();
@@ -100,8 +102,9 @@ public class MainActivity extends Activity implements
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
-        startActivity(questionnaire);
+
+//        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
+//        startActivity(questionnaire);
     }
 
     // Facebook Login Button Call Back

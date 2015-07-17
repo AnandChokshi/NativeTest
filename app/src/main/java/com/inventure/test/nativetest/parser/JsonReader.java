@@ -32,6 +32,7 @@ public class JsonReader {
     as this is not the final version
      */
     public void readDataFromJSON(JSONArray jsonArray) throws JSONException {
+        sections = new ArrayList<>();
         Section section;
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
@@ -40,6 +41,8 @@ public class JsonReader {
             section.setConditions(readFromConditionJson(object.getJSONArray("condition")));
             section.setConfirmation(object.getInt("showconfirmation"));
             section.setPages(readFromPageJson(object.getJSONArray("pages")));
+
+            sections.add(section);
         }
 
         insertInDatabase();
@@ -83,10 +86,14 @@ public class JsonReader {
         for (int i = 0; i < jsonArray.length(); i++) {
             Question question = new Question();
             JSONObject object = jsonArray.getJSONObject(i);
-
-            question.setQuestion_server_id(object.getInt("question_server_id"));
             String type = object.getString("type");
+
+            // TO DO: do something for plaintext
+            if(type.equals("plainText"))
+                continue;
+
             question.setType(type);
+            question.setQuestion_server_id(object.getString("question_server_id"));
             question.setLabel(object.getString("label"));
 
             if (type.equals(QuestionType.TEXT_BOX) || type.equals(QuestionType.TEXT_AREA))
@@ -111,7 +118,7 @@ public class JsonReader {
     private ArrayList<String> readDefaultValues(JSONArray jsonArray) throws JSONException {
         ArrayList<String> defaultValues = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            defaultValues.add(jsonArray.getJSONObject(i).getString("value"));
+            defaultValues.add(jsonArray.getString(i));
         }
 
         return defaultValues;
@@ -121,7 +128,7 @@ public class JsonReader {
     private Validation readValidationValues(JSONObject jsonObject) throws JSONException {
         Validation validation = new Validation();
         validation.setRequired(jsonObject.getInt("required"));
-        validation.setValidation_type(jsonObject.getString("validation_type"));
+        validation.setValidation_type(jsonObject.getString("type"));
         validation.setRegex(jsonObject.getString("regex"));
         validation.setError_message(jsonObject.getString("error_message"));
 

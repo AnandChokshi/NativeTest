@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.inventure.test.nativetest.model.Condition;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Section;
@@ -41,18 +42,68 @@ public class DbDataSource {
         ContentValues contentValues = new ContentValues();
 
         for (Section section : sections) {
+            contentValues.put(DbOpenHelper.CONFIRMATION, section.getConfirmation());
+            if (section.getConditions().size() > 0) {
+                contentValues.put(DbOpenHelper.CONDITION, 1);
+            } else {
+                contentValues.put(DbOpenHelper.CONDITION, 0);
+            }
+            contentValues.put(DbOpenHelper.STATUS, 0);
 
+            long section_id = sqLiteDatabase.insert(DbOpenHelper.SECTION_TABLE_NAME, null, contentValues);
+            // Insert Condition if exists
+            if (contentValues.getAsInteger(DbOpenHelper.CONDITION) == 1) {
+                insertCondition(section_id, DbOpenHelper.SECTION_ID, section.getConditions());
+            }
+
+            insertPages(section_id, section.getPages());
+
+            contentValues.clear();
         }
     }
 
-    // Insert JSON into database
-    private void insertPages(List<Page> pages) {
+    // Insert condition into database
+    private void insertCondition(long id, String id_type, List<Condition> conditions) {
+        ContentValues contentValues = new ContentValues();
+
+        for (Condition condition : conditions) {
+            if (id_type.equals(DbOpenHelper.PAGE_ID)) {
+                contentValues.put(DbOpenHelper.PAGE_ID, id);
+            } else {
+                contentValues.put(DbOpenHelper.SECTION_ID, id);
+            }
+            contentValues.put(DbOpenHelper.QUESTIONS_ID, condition.getQid());
+            contentValues.put(DbOpenHelper.ANSWER, condition.getAnswer());
+
+            if (id_type.equals(DbOpenHelper.PAGE_ID)) {
+                sqLiteDatabase.insert(DbOpenHelper.PAGE_CONDITION_TABLE_NAME, null, contentValues);
+            } else {
+                sqLiteDatabase.insert(DbOpenHelper.SECTION_CONDITION_TABLE_NAME, null, contentValues);
+            }
+
+            contentValues.clear();
+        }
+    }
+
+    // Insert Pages into database
+    private void insertPages(long section_id, List<Page> pages) {
         ContentValues contentValues = new ContentValues();
 
         for (Page page : pages) {
+            contentValues.put(DbOpenHelper.SECTION_ID, section_id);
+            if (page.getConditions().size() > 0) {
+                contentValues.put(DbOpenHelper.CONDITION, 1);
+            } else {
+                contentValues.put(DbOpenHelper.CONDITION, 0);
+            }
             contentValues.put(DbOpenHelper.STATUS, 0);
 
             long page_id = sqLiteDatabase.insert(DbOpenHelper.PAGE_TABLE_NAME, null, contentValues);
+            // Insert Condition if exists
+            if (contentValues.getAsInteger(DbOpenHelper.CONDITION) == 1) {
+                insertCondition(page_id, DbOpenHelper.PAGE_ID, page.getConditions());
+            }
+
             // Insert Questions into Database by page
             insertQuestions(page_id, page.getQuestions());
             contentValues.clear();
@@ -134,8 +185,50 @@ public class DbDataSource {
         }
     }
 
+    // Read Section
+    public Section readSection() {
+        Section section = new Section();
+        boolean loop = true;
+
+        while (loop) {
+            String query = "SELECT * FROM " + DbOpenHelper.SECTION_TABLE_NAME + " WHERE " +
+                    DbOpenHelper.STATUS + " = 0 LIMIT 1";
+
+            Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+            int section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
+
+            if (cursor.moveToNext()) {
+                section.setSection_id(section_id);
+                section.setConfirmation(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONFIRMATION)));
+                if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
+
+                }
+            }
+        }
+        return section;
+    }
+
+    // Check Condition for Section
+    private boolean checkSectionCondition(int section_id) {
+        String query = "SELECT * FROM " + DbOpenHelper.SECTION_CONDITION_TABLE_NAME + " WHERE " +
+                DbOpenHelper.SECTION_ID + " = " + section_id;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        // If Section Condition table doesn't have section id
+        if (cursor.moveToNext()) {
+            return false;
+        }
+
+        return false;
+    }
+
+    // Check Condition for Page
+    private boolean checkPageCondition(int page_id) {
+        return true;
+    }
+
     // Read Page by checking condition and status
-    public Page readPage() {
+    private Page readPage() {
         Page page = new Page();
         boolean loop = true;
 
@@ -199,7 +292,7 @@ public class DbDataSource {
     private void loadQuestions(Cursor cursor, ArrayList<Question> questions) {
         Question question = new Question();
         question.setQuestion_id(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_ID)));
-        question.setQuestion_server_id(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_SERVER_ID)));
+        question.setQuestion_server_id(cursor.getString(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_SERVER_ID)));
         question.setType(cursor.getString(cursor.getColumnIndex(DbOpenHelper.TYPE)));
         question.setLabel(cursor.getString(cursor.getColumnIndex(DbOpenHelper.LABEL)));
         question.setAnswer(cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER)));
