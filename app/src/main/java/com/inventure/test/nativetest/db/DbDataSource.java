@@ -247,7 +247,7 @@ public class DbDataSource {
     }
 
     // Set status zero
-    private void setStatus(int id, String tableName, String columnName) {
+    public void setStatus(int id, String tableName, String columnName) {
         ContentValues values = new ContentValues();
         values.put(DbOpenHelper.STATUS, 1);
         sqLiteDatabase.update(tableName, values, columnName + " = ?",

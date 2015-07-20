@@ -18,8 +18,10 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.inventure.test.nativetest.model.Question;
+import com.inventure.test.nativetest.model.Validation;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -82,11 +84,14 @@ public class UIHelper {
     private void makeTextBox(LinearLayout linearLayout, int position, String type) {
         //Initialize EditText
         EditText editText = new EditText(context);
+        editText.setLongClickable(false);
 
         // set properties according to Edit text type
         if (type.equals("textbox"))
             editText.setSingleLine(true);
         CustomTextWatcher customTextWatcher = new CustomTextWatcher(position);
+        if (!questions.get(position).getAnswer().equals("Empty"))
+            editText.setText(questions.get(position).getAnswer());
         editText.addTextChangedListener(customTextWatcher);
         linearLayout.addView(editText);
     }
@@ -105,7 +110,7 @@ public class UIHelper {
             RadioButton radioTemp = new RadioButton(context);
             radioTemp.setText(radio);
             radioTemp.setId(id_counter_radio * 100);
-            if (id_counter_radio == 1)
+            if (id_counter_radio == 1 || question.getAnswer().equals(radio))
                 radioTemp.setChecked(true);
 
             radioGroup.addView(radioTemp);
@@ -131,6 +136,8 @@ public class UIHelper {
             temp.setText(value);
             temp.setOnCheckedChangeListener(customCheckboxChangedListener);
             getCheckedCheckbox(position, value, temp.isChecked());
+            if (question.getAnswer().contains(value))
+                temp.setChecked(true);
             linearLayout.addView(temp);
         }
     }
@@ -327,6 +334,26 @@ public class UIHelper {
         public void onNothingSelected(AdapterView<?> parent) {
 
         }
+    }
+
+    // Check required conditions
+    public boolean validationCheck() {
+        Validation validation;
+        for (Question question : questions) {
+            validation = question.getValidation();
+            if (validation.getRequired() == 1) {
+                if (question.getAnswer().equals("") || question.getAnswer().equals("Empty")) {
+                    Toast.makeText(context, validation.getError_message(), Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+            //--------- check for regex here-----
+            //
+            //
+            //-----------------------------------
+        }
+
+        return true;
     }
 
     // To get the answers

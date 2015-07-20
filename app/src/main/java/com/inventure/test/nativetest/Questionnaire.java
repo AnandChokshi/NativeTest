@@ -3,14 +3,13 @@ package com.inventure.test.nativetest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.inventure.test.nativetest.db.DbDataSource;
+import com.inventure.test.nativetest.db.DbOpenHelper;
 import com.inventure.test.nativetest.model.Page;
-import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Section;
 import com.inventure.test.nativetest.util.UIHelper;
 
@@ -47,9 +46,15 @@ public class Questionnaire extends Activity {
         }
 
         if (section.getPages().size() == 0) {
-            // if page array is null set status of section null
-            // Check whether it has confirmation flag set
-            // and load next section by restarting the activity
+            dbDataSource.setStatus(section.getSection_id(), DbOpenHelper.SECTION_TABLE_NAME, DbOpenHelper.SECTION_ID);
+            if (section.getConfirmation() == 1) {
+                // start review activity here
+            } else {
+                restartActivity();
+            }
+            // To TEST => after implementing review screen remove line of code after this
+            restartActivity();
+            // Remove above code after review screen
         } else {
             page = section.getPages().get(0);
             uiHelper = new UIHelper(this, page.getQuestions(), linearLayout);
@@ -63,12 +68,11 @@ public class Questionnaire extends Activity {
             next.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    page.setQuestions(uiHelper.getAnswers());
-                    for (Question question : page.getQuestions()) {
-                        Log.d("TEXT", question.getAnswer() + "\n");
+                    if (uiHelper.validationCheck()) {
+                        page.setQuestions(uiHelper.getAnswers());
+                        storeAnswer(page);
+                        onResume();
                     }
-                    storeAnswer(page);
-                    onResume();
                 }
             });
             linearLayout.addView(next);
