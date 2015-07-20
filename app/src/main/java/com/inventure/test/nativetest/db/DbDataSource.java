@@ -72,7 +72,7 @@ public class DbDataSource {
             } else {
                 contentValues.put(DbOpenHelper.SECTION_ID, id);
             }
-            contentValues.put(DbOpenHelper.QUESTIONS_ID, condition.getQid());
+            contentValues.put(DbOpenHelper.QUESTIONS_SERVER_ID, condition.getQid());
             contentValues.put(DbOpenHelper.ANSWER, condition.getAnswer());
 
             if (id_type.equals(DbOpenHelper.PAGE_ID)) {
@@ -185,94 +185,108 @@ public class DbDataSource {
         }
     }
 
-    // Read Section
+    // Read Section based on conditions and status
     public Section readSection() {
         Section section = new Section();
         boolean loop = true;
+        Cursor cursor;
+        String query;
+        int section_id;
 
         while (loop) {
-            String query = "SELECT * FROM " + DbOpenHelper.SECTION_TABLE_NAME + " WHERE " +
+            query = "SELECT * FROM " + DbOpenHelper.SECTION_TABLE_NAME + " WHERE " +
                     DbOpenHelper.STATUS + " = 0 LIMIT 1";
 
-            Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-            int section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
+            cursor = sqLiteDatabase.rawQuery(query, null);
 
             if (cursor.moveToNext()) {
+                section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
                 section.setSection_id(section_id);
                 section.setConfirmation(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONFIRMATION)));
                 if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
-
+                    if (!checkCondition(section_id, DbOpenHelper.SECTION_TABLE_NAME,
+                            DbOpenHelper.SECTION_CONDITION_TABLE_NAME, DbOpenHelper.SECTION_ID)) {
+                        continue;
+                    }
                 }
+                section.setPages(readPage(section_id));
             }
+            loop = false;
+            cursor.close();
         }
         return section;
     }
 
-    // Check Condition for Section
-    private boolean checkSectionCondition(int section_id) {
-        String query = "SELECT * FROM " + DbOpenHelper.SECTION_CONDITION_TABLE_NAME + " WHERE " +
-                DbOpenHelper.SECTION_ID + " = " + section_id;
+    // Check Condition for page and section
+    private boolean checkCondition(int id, String tableName, String conditionTableName, String columnName) {
+        String query = "SELECT * FROM " + conditionTableName + " WHERE " +
+                columnName + " = " + id;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-        // If Section Condition table doesn't have section id
-        if (cursor.moveToNext()) {
-            return false;
+
+        // variable to confirm that every condition of one section is satisfied
+        int count = cursor.getCount();
+
+        while (cursor.moveToNext()) {
+            count--;
+            query = "SELECT * FROM " + DbOpenHelper.QUESTIONS_TABLE_NAME + " WHERE " +
+                    DbOpenHelper.QUESTIONS_SERVER_ID + " = '" + cursor.getString(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_SERVER_ID)) + "' AND " +
+                    DbOpenHelper.ANSWER + " = '" + cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER)) + "'";
+
+            Cursor cursorInside = sqLiteDatabase.rawQuery(query, null);
+            if (!cursorInside.moveToNext()) {
+                setStatus(id, tableName, columnName);
+                break;
+            } else {
+                if (count == 0)
+                    return true;
+            }
         }
 
         return false;
     }
 
-    // Check Condition for Page
-    private boolean checkPageCondition(int page_id) {
-        return true;
+    // Set status zero
+    private void setStatus(int id, String tableName, String columnName) {
+        ContentValues values = new ContentValues();
+        values.put(DbOpenHelper.STATUS, 1);
+        sqLiteDatabase.update(tableName, values, columnName + " = ?",
+                new String[]{String.valueOf(id)});
     }
 
-    // Read Page by checking condition and status
-    private Page readPage() {
+    // Read Page of section by checking condition and status
+    public ArrayList<Page> readPage(int section_id) {
+        ArrayList<Page> pages = new ArrayList<>();
         Page page = new Page();
         boolean loop = true;
+        String query;
+        Cursor cursor;
+        int page_id;
 
         while (loop) {
-            String query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
+            query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
+                    DbOpenHelper.SECTION_ID + " = " + section_id + " AND " +
                     DbOpenHelper.STATUS + " = 0 LIMIT 1";
 
-            Cursor cursor = sqLiteDatabase.rawQuery(query, null);
-            int page_id;
+            cursor = sqLiteDatabase.rawQuery(query, null);
 
             if (cursor.moveToNext()) {
                 page_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.PAGE_ID));
-                int question_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.QUESTIONS_ID));
-
-                // if question_id is zero then load the page otherwise check condition
-                if (question_id != 0) {
-                    // Check that page satisfies the condition
-                    query = "SELECT * FROM " + DbOpenHelper.QUESTIONS_TABLE_NAME + " WHERE " +
-                            DbOpenHelper.QUESTIONS_ID + " = " + question_id + " AND " +
-                            DbOpenHelper.ANSWER + " = '" + cursor.getString(cursor.getColumnIndex(DbOpenHelper.ANSWER)) + "'";
-
-                    cursor = sqLiteDatabase.rawQuery(query, null);
-
-                    // if condition satisfies then load the page otherwise change the status and call method again
-                    if (!cursor.moveToNext()) {
-                        ContentValues values = new ContentValues();
-                        values.put(DbOpenHelper.STATUS, 1);
-                        sqLiteDatabase.update(DbOpenHelper.PAGE_TABLE_NAME, values, DbOpenHelper.PAGE_ID + " = ?",
-                                new String[]{String.valueOf(page_id)});
-
-                        cursor.close();
-                        continue;
-                    } else {
-                        loadPage(page_id, page);
-                    }
-                } else {
-                    loadPage(page_id, page);
-                }
                 page.setPage_id(page_id);
-                loop = false;
+                if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
+                    if (!checkCondition(page_id, DbOpenHelper.PAGE_TABLE_NAME,
+                            DbOpenHelper.PAGE_CONDITION_TABLE_NAME, DbOpenHelper.PAGE_ID)) {
+                        continue;
+                    }
+                }
+                loadPage(page_id, page);
+                pages.add(page);
             }
+            loop = false;
             cursor.close();
         }
-        return page;
+
+        return pages;
     }
 
     // Load page from database

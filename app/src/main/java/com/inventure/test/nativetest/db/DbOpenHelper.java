@@ -110,14 +110,14 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + PAGE_CONDITION_TABLE_NAME + " (" +
                     CONDITION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     PAGE_ID + " INTEGER, " +
-                    QUESTIONS_ID + " INTEGER, " +
+                    QUESTIONS_SERVER_ID + " TEXT, " +
                     ANSWER + " TEXT, " +
                     "FOREIGN KEY(" + PAGE_ID + ") REFERENCES " + PAGE_TABLE_NAME + "(" + PAGE_ID + "))";
     private static final String SECTION_CONDITION_TABLE_CREATE =
             "CREATE TABLE " + SECTION_CONDITION_TABLE_NAME + " (" +
                     CONDITION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     SECTION_ID + " INTEGER, " +
-                    QUESTIONS_ID + " INTEGER, " +
+                    QUESTIONS_SERVER_ID + " TEXT, " +
                     ANSWER + " TEXT, " +
                     "FOREIGN KEY(" + SECTION_ID + ") REFERENCES " + SECTION_TABLE_NAME + "(" + SECTION_ID + "))";
 
