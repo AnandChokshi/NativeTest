@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements
             @Override
             public void onSuccess(LoginResult loginResult) {
                 finish();
-                Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
+                Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
                 startActivity(questionnaire);
             }
 
@@ -103,7 +103,7 @@ public class MainActivity extends Activity implements
             e.printStackTrace();
         }
 
-        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
+        Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
         startActivity(questionnaire);
     }
 
@@ -161,7 +161,7 @@ public class MainActivity extends Activity implements
         // establish a service connection to Google Play services.
         mShouldResolve = false;
         finish();
-        Intent questionnaire = new Intent(getBaseContext(), Questionnaire.class);
+        Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
         startActivity(questionnaire);
     }
 

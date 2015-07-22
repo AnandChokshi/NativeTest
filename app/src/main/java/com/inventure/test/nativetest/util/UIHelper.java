@@ -144,6 +144,7 @@ public class UIHelper {
 
     private void makeDatePicker(LinearLayout linearLayout, int position) {
         EditText selectDate = new EditText(context);
+        selectDate.setFocusable(false);
 
         CustomDateSetListener customDateSetListener = new CustomDateSetListener(position, selectDate);
         Calendar newCalendar = Calendar.getInstance();
@@ -158,6 +159,7 @@ public class UIHelper {
 
     private void makeTimePicker(LinearLayout linearLayout, int position) {
         EditText selectTime = new EditText(context);
+        selectTime.setFocusable(false);
 
         CustomTimeSetListener customTimeSetListener = new CustomTimeSetListener(position, selectTime);
         Calendar newTime = Calendar.getInstance();
@@ -347,7 +349,7 @@ public class UIHelper {
                     return false;
                 }
             }
-            //--------- check for regex here-----
+            //----------check for regex here-----
             //
             //
             //-----------------------------------

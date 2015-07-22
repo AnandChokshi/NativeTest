@@ -2,7 +2,8 @@
     <string name="app_name">NativeTest</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_zenDesk">Contact Us</string>
     <string name="facebook_app_id">1004354192916439</string>
-    <string name="title_activity_questionnaire">Questionnaire</string>
+    <string name="title_activity_questionnaire">QuestionnaireActivity</string>
+    <string name="title_activity_account">AccountActivity</string>
 </resources>

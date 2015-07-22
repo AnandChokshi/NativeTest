@@ -11,6 +11,7 @@ public class Page {
     private ArrayList<Question> questions;
     private ArrayList<Condition> conditions;
     private int status;
+    private String timeStamp;
 
     public int getSection_id() {
         return section_id;
@@ -50,5 +51,13 @@ public class Page {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

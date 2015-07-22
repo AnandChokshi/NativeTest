@@ -31,8 +31,12 @@
             android:value="@string/facebook_app_id" />
 
         <activity
-            android:name=".Questionnaire"
+            android:name=".QuestionnaireActivity"
             android:label="@string/title_activity_questionnaire" >
+        </activity>
+        <activity
+            android:name=".AccountActivity"
+            android:label="@string/title_activity_account" >
         </activity>
     </application>
 

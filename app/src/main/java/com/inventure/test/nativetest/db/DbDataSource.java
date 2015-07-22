@@ -97,6 +97,8 @@ public class DbDataSource {
                 contentValues.put(DbOpenHelper.CONDITION, 0);
             }
             contentValues.put(DbOpenHelper.STATUS, 0);
+            contentValues.put(DbOpenHelper.CREATED_TIME_STAMP, "Empty");
+            contentValues.put(DbOpenHelper.MODIFIED_TIME_STAMP, "Empty");
 
             long page_id = sqLiteDatabase.insert(DbOpenHelper.PAGE_TABLE_NAME, null, contentValues);
             // Insert Condition if exists
@@ -236,6 +238,7 @@ public class DbDataSource {
             Cursor cursorInside = sqLiteDatabase.rawQuery(query, null);
             if (!cursorInside.moveToNext()) {
                 setStatus(id, tableName, columnName);
+                cursorInside.close();
                 break;
             } else {
                 if (count == 0)
@@ -243,6 +246,7 @@ public class DbDataSource {
             }
         }
 
+        cursor.close();
         return false;
     }
 
@@ -355,17 +359,29 @@ public class DbDataSource {
     }
 
     public void insertAnswer(Page page) {
-        ContentValues values;
+        ContentValues values = new ContentValues();
         for (Question question : page.getQuestions()) {
-            values = new ContentValues();
             values.put(DbOpenHelper.ANSWER, question.getAnswer());
 
             sqLiteDatabase.update(DbOpenHelper.QUESTIONS_TABLE_NAME, values, DbOpenHelper.QUESTIONS_ID + " = ?",
                     new String[]{String.valueOf(question.getQuestion_id())});
+
+            values.clear();
         }
-        values = new ContentValues();
+
+        String query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
+                DbOpenHelper.PAGE_ID + " = " + page.getPage_id() + " AND " +
+                DbOpenHelper.CREATED_TIME_STAMP + " = 'Empty'";
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
         values.put(DbOpenHelper.STATUS, 1);
+        if (cursor.moveToNext()) {
+            values.put(DbOpenHelper.CREATED_TIME_STAMP, page.getTimeStamp());
+        }
+        values.put(DbOpenHelper.MODIFIED_TIME_STAMP, page.getTimeStamp());
         sqLiteDatabase.update(DbOpenHelper.PAGE_TABLE_NAME, values, DbOpenHelper.PAGE_ID + " = ?",
                 new String[]{String.valueOf(page.getPage_id())});
+
+        cursor.close();
     }
 }

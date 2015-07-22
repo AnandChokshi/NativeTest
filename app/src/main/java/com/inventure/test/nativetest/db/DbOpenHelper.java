@@ -33,6 +33,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     // Page table Columns
     public static final String PAGE_ID = "page_id";
+    public static final String CREATED_TIME_STAMP = "created_time_stamp";
+    public static final String MODIFIED_TIME_STAMP = "modified_time_stamp";
 
     // Questions table Columns
     public static final String QUESTIONS_ID = "questions_id";
@@ -74,6 +76,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     SECTION_ID + " INTEGER, " +
                     CONDITION + " INTEGER, " +
                     STATUS + " INTEGER, " +
+                    CREATED_TIME_STAMP + " TEXT, " +
+                    MODIFIED_TIME_STAMP + " TEXT, " +
                     "FOREIGN KEY(" + SECTION_ID + ") REFERENCES " + SECTION_TABLE_NAME + "(" + SECTION_ID + "))";
     private static final String QUESTIONS_TABLE_CREATE =
             "CREATE TABLE " + QUESTIONS_TABLE_NAME + " (" +
