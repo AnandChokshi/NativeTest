@@ -38,7 +38,6 @@ public class JsonReader {
             JSONObject object = jsonArray.getJSONObject(i);
             section = new Section();
 
-            section.setConditions(readFromConditionJson(object.getJSONArray("condition")));
             section.setConfirmation(object.getInt("showconfirmation"));
             section.setPages(readFromPageJson(object.getJSONArray("pages")));
 

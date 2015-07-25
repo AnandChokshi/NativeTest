@@ -43,18 +43,9 @@ public class DbDataSource {
 
         for (Section section : sections) {
             contentValues.put(DbOpenHelper.CONFIRMATION, section.getConfirmation());
-            if (section.getConditions().size() > 0) {
-                contentValues.put(DbOpenHelper.CONDITION, 1);
-            } else {
-                contentValues.put(DbOpenHelper.CONDITION, 0);
-            }
             contentValues.put(DbOpenHelper.STATUS, 0);
 
             long section_id = sqLiteDatabase.insert(DbOpenHelper.SECTION_TABLE_NAME, null, contentValues);
-            // Insert Condition if exists
-            if (contentValues.getAsInteger(DbOpenHelper.CONDITION) == 1) {
-                insertCondition(section_id, DbOpenHelper.SECTION_ID, section.getConditions());
-            }
 
             insertPages(section_id, section.getPages());
 
@@ -63,23 +54,15 @@ public class DbDataSource {
     }
 
     // Insert condition into database
-    private void insertCondition(long id, String id_type, List<Condition> conditions) {
+    private void insertCondition(long id, List<Condition> conditions) {
         ContentValues contentValues = new ContentValues();
 
         for (Condition condition : conditions) {
-            if (id_type.equals(DbOpenHelper.PAGE_ID)) {
-                contentValues.put(DbOpenHelper.PAGE_ID, id);
-            } else {
-                contentValues.put(DbOpenHelper.SECTION_ID, id);
-            }
+            contentValues.put(DbOpenHelper.PAGE_ID, id);
             contentValues.put(DbOpenHelper.QUESTIONS_SERVER_ID, condition.getQid());
             contentValues.put(DbOpenHelper.ANSWER, condition.getAnswer());
 
-            if (id_type.equals(DbOpenHelper.PAGE_ID)) {
-                sqLiteDatabase.insert(DbOpenHelper.PAGE_CONDITION_TABLE_NAME, null, contentValues);
-            } else {
-                sqLiteDatabase.insert(DbOpenHelper.SECTION_CONDITION_TABLE_NAME, null, contentValues);
-            }
+            sqLiteDatabase.insert(DbOpenHelper.PAGE_CONDITION_TABLE_NAME, null, contentValues);
 
             contentValues.clear();
         }
@@ -103,7 +86,7 @@ public class DbDataSource {
             long page_id = sqLiteDatabase.insert(DbOpenHelper.PAGE_TABLE_NAME, null, contentValues);
             // Insert Condition if exists
             if (contentValues.getAsInteger(DbOpenHelper.CONDITION) == 1) {
-                insertCondition(page_id, DbOpenHelper.PAGE_ID, page.getConditions());
+                insertCondition(page_id, page.getConditions());
             }
 
             // Insert Questions into Database by page
@@ -187,46 +170,39 @@ public class DbDataSource {
         }
     }
 
-    // Read Section based on conditions and status
+    // Read Section
     public Section readSection() {
         Section section = new Section();
-        boolean loop = true;
+
         Cursor cursor;
         String query;
         int section_id;
 
-        while (loop) {
-            query = "SELECT * FROM " + DbOpenHelper.SECTION_TABLE_NAME + " WHERE " +
-                    DbOpenHelper.STATUS + " = 0 LIMIT 1";
+        query = "SELECT * FROM " + DbOpenHelper.SECTION_TABLE_NAME + " WHERE " +
+                DbOpenHelper.STATUS + " = 0 LIMIT 1";
 
-            cursor = sqLiteDatabase.rawQuery(query, null);
+        cursor = sqLiteDatabase.rawQuery(query, null);
 
-            if (cursor.moveToNext()) {
-                section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
-                section.setSection_id(section_id);
-                section.setConfirmation(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONFIRMATION)));
-                if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
-                    if (!checkCondition(section_id, DbOpenHelper.SECTION_TABLE_NAME,
-                            DbOpenHelper.SECTION_CONDITION_TABLE_NAME, DbOpenHelper.SECTION_ID)) {
-                        continue;
-                    }
-                }
-                section.setPages(readPage(section_id));
-            }
-            loop = false;
-            cursor.close();
+        if (cursor.moveToNext()) {
+            section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
+            section.setSection_id(section_id);
+            section.setConfirmation(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONFIRMATION)));
+            section.setPages(readPage(section_id));
         }
+
+        cursor.close();
+
         return section;
     }
 
-    // Check Condition for page and section
+    // Check Condition for page
     private boolean checkCondition(int id, String tableName, String conditionTableName, String columnName) {
         String query = "SELECT * FROM " + conditionTableName + " WHERE " +
                 columnName + " = " + id;
 
         Cursor cursor = sqLiteDatabase.rawQuery(query, null);
 
-        // variable to confirm that every condition of one section is satisfied
+        // variable to confirm that every condition of is satisfied
         int count = cursor.getCount();
 
         while (cursor.moveToNext()) {
@@ -258,7 +234,7 @@ public class DbDataSource {
                 new String[]{String.valueOf(id)});
     }
 
-    // Read Page of section by checking condition and status
+    // Read Page of section by checking condition and status (Reads only one page)
     public ArrayList<Page> readPage(int section_id) {
         ArrayList<Page> pages = new ArrayList<>();
         Page page = new Page();

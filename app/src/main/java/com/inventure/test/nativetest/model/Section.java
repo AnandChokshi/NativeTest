@@ -7,7 +7,6 @@ import java.util.ArrayList;
  */
 public class Section {
     private int section_id;
-    private ArrayList<Condition> conditions;
     private int confirmation;
     private ArrayList<Page> pages;
     private int status;
@@ -18,14 +17,6 @@ public class Section {
 
     public void setSection_id(int section_id) {
         this.section_id = section_id;
-    }
-
-    public ArrayList<Condition> getConditions() {
-        return conditions;
-    }
-
-    public void setConditions(ArrayList<Condition> conditions) {
-        this.conditions = conditions;
     }
 
     public int getConfirmation() {

@@ -36,6 +36,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questionnaire);
         restartActivity = getIntent();
+
+        // For stopping the animation of activity reloading
+        restartActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        //overridePendingTransition(0, 0);
+
         linearLayout = (LinearLayout) findViewById(R.id.linearID);
 
         dbDataSource = new DbDataSource(this);
