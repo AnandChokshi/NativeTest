@@ -149,6 +149,7 @@ public class DbDataSource {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DbOpenHelper.QUESTIONS_ID, que_id);
         contentValues.put(DbOpenHelper.REQUIRED, validation.getRequired());
+        contentValues.put(DbOpenHelper.SERVER_VALIDATION, validation.getServer_validation());
         contentValues.put(DbOpenHelper.VALIDATION_TYPE, validation.getValidation_type());
         contentValues.put(DbOpenHelper.REGEX, validation.getRegex());
         contentValues.put(DbOpenHelper.ERROR_MESSAGE, validation.getError_message());
@@ -187,12 +188,51 @@ public class DbDataSource {
             section_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.SECTION_ID));
             section.setSection_id(section_id);
             section.setConfirmation(cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONFIRMATION)));
-            section.setPages(readPage(section_id));
         }
 
         cursor.close();
 
         return section;
+    }
+
+    // Read Page of section by checking condition and status (Reads only one page)
+    public ArrayList<Page> readPage(int section_id) {
+        ArrayList<Page> pages = new ArrayList<>();
+        Page page = new Page();
+        boolean loop = true;
+        String query;
+        Cursor cursor;
+        int page_id;
+
+        while (loop) {
+            query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
+                    DbOpenHelper.SECTION_ID + " = " + section_id + " AND " +
+                    DbOpenHelper.STATUS + " = 0 LIMIT 1";
+
+            cursor = sqLiteDatabase.rawQuery(query, null);
+
+            if (cursor.moveToNext()) {
+                page_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.PAGE_ID));
+                page.setPage_id(page_id);
+                if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
+                    if (!checkCondition(page_id, DbOpenHelper.PAGE_TABLE_NAME,
+                            DbOpenHelper.PAGE_CONDITION_TABLE_NAME, DbOpenHelper.PAGE_ID)) {
+                        continue;
+                    }
+                }
+                loadPage(page_id, page);
+                pages.add(page);
+            }
+            loop = false;
+            cursor.close();
+        }
+
+        // If there is not next page to load then set status zero of section
+        if (pages.size() == 0) {
+            setStatus(section_id, DbOpenHelper.SECTION_TABLE_NAME, DbOpenHelper.SECTION_ID);
+        }
+
+        return pages;
     }
 
     // Check Condition for page
@@ -232,41 +272,6 @@ public class DbDataSource {
         values.put(DbOpenHelper.STATUS, 1);
         sqLiteDatabase.update(tableName, values, columnName + " = ?",
                 new String[]{String.valueOf(id)});
-    }
-
-    // Read Page of section by checking condition and status (Reads only one page)
-    public ArrayList<Page> readPage(int section_id) {
-        ArrayList<Page> pages = new ArrayList<>();
-        Page page = new Page();
-        boolean loop = true;
-        String query;
-        Cursor cursor;
-        int page_id;
-
-        while (loop) {
-            query = "SELECT * FROM " + DbOpenHelper.PAGE_TABLE_NAME + " WHERE " +
-                    DbOpenHelper.SECTION_ID + " = " + section_id + " AND " +
-                    DbOpenHelper.STATUS + " = 0 LIMIT 1";
-
-            cursor = sqLiteDatabase.rawQuery(query, null);
-
-            if (cursor.moveToNext()) {
-                page_id = cursor.getInt(cursor.getColumnIndex(DbOpenHelper.PAGE_ID));
-                page.setPage_id(page_id);
-                if (cursor.getInt(cursor.getColumnIndex(DbOpenHelper.CONDITION)) == 1) {
-                    if (!checkCondition(page_id, DbOpenHelper.PAGE_TABLE_NAME,
-                            DbOpenHelper.PAGE_CONDITION_TABLE_NAME, DbOpenHelper.PAGE_ID)) {
-                        continue;
-                    }
-                }
-                loadPage(page_id, page);
-                pages.add(page);
-            }
-            loop = false;
-            cursor.close();
-        }
-
-        return pages;
     }
 
     // Load page from database
@@ -313,6 +318,7 @@ public class DbDataSource {
         cursorInside.moveToNext();
 
         validation.setRequired(cursorInside.getInt(cursorInside.getColumnIndex(DbOpenHelper.REQUIRED)));
+        validation.setServer_validation(cursorInside.getInt(cursorInside.getColumnIndex(DbOpenHelper.SERVER_VALIDATION)));
         validation.setValidation_type(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.VALIDATION_TYPE)));
         validation.setRegex(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.REGEX)));
         validation.setError_message(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.ERROR_MESSAGE)));

@@ -54,6 +54,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     // Validation table Columns
     public static final String VALIDATION_ID = "validation_id";
     public static final String REQUIRED = "requried";
+    public static final String SERVER_VALIDATION = "server_validation";
     public static final String VALIDATION_TYPE = "validation_type";
     public static final String REGEX = "regex";
     public static final String ERROR_MESSAGE = "error_message";
@@ -104,6 +105,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     VALIDATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     QUESTIONS_ID + " INTEGER, " +
                     REQUIRED + " INTEGER, " +
+                    SERVER_VALIDATION + " INTEGER, " +
                     VALIDATION_TYPE + " TEXT, " +
                     REGEX + " TEXT, " +
                     ERROR_MESSAGE + " TEXT, " +

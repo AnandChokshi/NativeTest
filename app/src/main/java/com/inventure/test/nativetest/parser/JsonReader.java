@@ -127,6 +127,7 @@ public class JsonReader {
     private Validation readValidationValues(JSONObject jsonObject) throws JSONException {
         Validation validation = new Validation();
         validation.setRequired(jsonObject.getInt("required"));
+        validation.setServer_validation(jsonObject.getInt("server_validation"));
         validation.setValidation_type(jsonObject.getString("type"));
         validation.setRegex(jsonObject.getString("regex"));
         validation.setError_message(jsonObject.getString("error_message"));

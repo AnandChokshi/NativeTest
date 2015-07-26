@@ -6,6 +6,7 @@ package com.inventure.test.nativetest.model;
 public class Validation {
 
     private int required;
+    private int server_validation;
     private String validation_type;
     private String regex;
     private String error_message;
@@ -16,6 +17,14 @@ public class Validation {
 
     public void setRequired(int required) {
         this.required = required;
+    }
+
+    public int getServer_validation() {
+        return server_validation;
+    }
+
+    public void setServer_validation(int server_validation) {
+        this.server_validation = server_validation;
     }
 
     public String getValidation_type() {
