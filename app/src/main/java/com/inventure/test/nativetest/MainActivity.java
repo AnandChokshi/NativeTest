@@ -24,6 +24,7 @@ import com.inventure.test.nativetest.testUtil.JsonCreator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends Activity implements
@@ -95,16 +96,16 @@ public class MainActivity extends Activity implements
 
         // Reads data from test json and load it into database
         try {
-            JSONArray jsonArray = JsonCreator.getJsonArray();
+            JSONObject jsonObject = JsonCreator.getJson();
+            JSONArray jsonArray = jsonObject.getJSONArray("section");
             JsonReader jsonReader = new JsonReader(this);
             jsonReader.readDataFromJSON(jsonArray);
 
+            finish();
+            ServerDecision.launchActivity(jsonObject.getString("type"), this);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
-        startActivity(questionnaire);
     }
 
     // Facebook Login Button Call Back

@@ -43,53 +43,44 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     // Load questionnaire
     private void loadQuestionnaire() {
-        // if section's page array is null which means we are at the end of the questionnaire
-        // Then start the account flow
-        if (section.getPages() == null && uiHelper != null) {
-            // Start account flow here
-            finish();
-            Intent accountActivity = new Intent(this, AccountActivity.class);
-            startActivity(accountActivity);
-        } else {
-            section.setPages(dbDataSource.readPage(section.getSection_id()));
+        section.setPages(dbDataSource.readPage(section.getSection_id()));
 
-            // if no more page then send data to server or show review activity if confirm flag is set
-            if (section.getPages().size() == 0) {
-                if (section.getConfirmation() == 1) {
-                    // start review activity and finish this activity
-                    Log.d("TEST", "REVIEW START");
-                } else {
-                    // send data to server directly without review screen
-                    Log.d("TEST", "DATA SENT TO SERVER");
-                }
-
-                // This block of code is for test------------------------------------------------
-                finish();
-                startActivity(new Intent(this, QuestionnaireActivity.class));
-                //-------------------------------------------------------------------------------
+        // if no more page then send data to server or show review activity if confirm flag is set
+        if (section.getPages().size() == 0) {
+            if (section.getConfirmation() == 1) {
+                // start review activity and finish this activity
+                Log.d("TEST", "REVIEW START");
             } else {
-                page = section.getPages().get(0);
-                uiHelper = new UIHelper(this, page.getQuestions(), linearLayout);
-
-                linearLayout.removeAllViews();
-                uiHelper.loadView();
-
-                // add and set next button
-                Button next = new Button(this);
-                next.setText("NEXT");
-                next.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (uiHelper.validationCheck()) {
-                            page.setQuestions(uiHelper.getAnswers());
-                            page.setTimeStamp(new Timestamp(new Date().getTime()).toString());
-                            storeAnswer(page);
-                            loadQuestionnaire();
-                        }
-                    }
-                });
-                linearLayout.addView(next);
+                // send data to server directly without review screen
+                Log.d("TEST", "DATA SENT TO SERVER");
             }
+
+            // This block of code is for test------------------------------------------------
+            finish();
+            startActivity(new Intent(this, QuestionnaireActivity.class));
+            //-------------------------------------------------------------------------------
+        } else {
+            page = section.getPages().get(0);
+            uiHelper = new UIHelper(this, page.getQuestions(), linearLayout);
+
+            linearLayout.removeAllViews();
+            uiHelper.loadView();
+
+            // add and set next button
+            Button next = new Button(this);
+            next.setText("NEXT");
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (uiHelper.validationCheck()) {
+                        page.setQuestions(uiHelper.getAnswers());
+                        page.setTimeStamp(new Timestamp(new Date().getTime()).toString());
+                        storeAnswer(page);
+                        loadQuestionnaire();
+                    }
+                }
+            });
+            linearLayout.addView(next);
         }
     }
 
