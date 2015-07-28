@@ -1,9 +1,11 @@
-package com.inventure.test.nativetest;
+package com.inventure.test.nativetest.util;
 
 import android.content.Context;
 import android.content.Intent;
 
-import com.inventure.test.nativetest.util.ActivityTypes;
+import com.inventure.test.nativetest.AccountActivity;
+import com.inventure.test.nativetest.Congratulation;
+import com.inventure.test.nativetest.QuestionnaireActivity;
 
 /**
  * Created by Anand on 7/27/2015.
@@ -22,6 +24,10 @@ public class ServerDecision {
                 context.startActivity(startNewActivity);
                 break;
             case ActivityTypes.GENERAL_PURPOSE:
+                break;
+            case ActivityTypes.CONGRATULATION:
+                startNewActivity = new Intent(context, Congratulation.class);
+                context.startActivity(startNewActivity);
                 break;
         }
     }

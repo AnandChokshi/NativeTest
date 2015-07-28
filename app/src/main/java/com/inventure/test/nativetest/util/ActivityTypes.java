@@ -8,4 +8,5 @@ public class ActivityTypes {
     public static final String QUESTIONNAIRE = "questionnaire";
     public static final String ACCOUNT = "account";
     public static final String GENERAL_PURPOSE = "general_purpose";
+    public static final String CONGRATULATION = "congratulation";
 }

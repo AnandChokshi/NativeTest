@@ -21,6 +21,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.inventure.test.nativetest.parser.JsonReader;
 import com.inventure.test.nativetest.testUtil.JsonCreator;
+import com.inventure.test.nativetest.util.ServerDecision;
 
 import org.json.JSONArray;
 import org.json.JSONException;
