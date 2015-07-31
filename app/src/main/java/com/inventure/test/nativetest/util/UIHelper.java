@@ -110,7 +110,7 @@ public class UIHelper {
             RadioButton radioTemp = new RadioButton(context);
             radioTemp.setText(radio);
             radioTemp.setId(id_counter_radio * 100);
-            if (id_counter_radio == 1 || question.getAnswer().equals(radio))
+            if (question.getAnswer().equals(radio))
                 radioTemp.setChecked(true);
 
             radioGroup.addView(radioTemp);
@@ -224,7 +224,9 @@ public class UIHelper {
     // Get the checked radio button ID
     private void getCheckRadioButton(int position, RadioGroup group, int checkedId) {
         RadioButton radioButton = (RadioButton) group.findViewById(checkedId);
-        questions.get(position).setAnswer(radioButton.getText().toString());
+        if (radioButton != null) {
+            questions.get(position).setAnswer(radioButton.getText().toString());
+        }
     }
 
     // To Store answer of Checkbox

@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.inventure.test.nativetest.AccountActivity;
 import com.inventure.test.nativetest.Congratulation;
-import com.inventure.test.nativetest.QuestionnaireActivity;
+import com.inventure.test.nativetest.SurveyActivity;
 
 /**
  * Created by Anand on 7/27/2015.
@@ -15,8 +15,8 @@ public class ServerDecision {
     public static void launchActivity(String type, Context context) {
         Intent startNewActivity;
         switch (type) {
-            case ActivityTypes.QUESTIONNAIRE:
-                startNewActivity = new Intent(context, QuestionnaireActivity.class);
+            case ActivityTypes.SURVEY:
+                startNewActivity = new Intent(context, SurveyActivity.class);
                 context.startActivity(startNewActivity);
                 break;
             case ActivityTypes.ACCOUNT:

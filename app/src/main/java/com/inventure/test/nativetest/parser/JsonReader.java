@@ -6,7 +6,6 @@ import com.inventure.test.nativetest.db.DbDataSource;
 import com.inventure.test.nativetest.model.Condition;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
-import com.inventure.test.nativetest.model.Section;
 import com.inventure.test.nativetest.model.Validation;
 import com.inventure.test.nativetest.util.QuestionType;
 
@@ -21,7 +20,7 @@ import java.util.ArrayList;
  */
 public class JsonReader {
     private Context context;
-    private ArrayList<Section> sections;
+    private ArrayList<Page> pages;
 
     public JsonReader(Context context) {
         this.context = context;
@@ -32,25 +31,9 @@ public class JsonReader {
     as this is not the final version
      */
     public void readDataFromJSON(JSONArray jsonArray) throws JSONException {
-        sections = new ArrayList<>();
-        Section section;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject object = jsonArray.getJSONObject(i);
-            section = new Section();
-
-            section.setConfirmation(object.getInt("showconfirmation"));
-            section.setPages(readFromPageJson(object.getJSONArray("pages")));
-
-            sections.add(section);
-        }
-
-        insertInDatabase();
-    }
-
-    // Read from Page
-    private ArrayList<Page> readFromPageJson(JSONArray jsonArray) throws JSONException {
-        ArrayList<Page> pages = new ArrayList<>();
+        pages = new ArrayList<>();
         Page page;
+
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             page = new Page();
@@ -61,7 +44,7 @@ public class JsonReader {
             pages.add(page);
         }
 
-        return pages;
+        insertInDatabase();
     }
 
     // Read Condition of the page
@@ -88,7 +71,7 @@ public class JsonReader {
             String type = object.getString("type");
 
             // TO DO: do something for plaintext
-            if(type.equals("plainText"))
+            if (type.equals("plainText"))
                 continue;
 
             question.setType(type);
@@ -139,7 +122,8 @@ public class JsonReader {
     private ArrayList<String> readFromOptions(JSONArray jsonArray) throws JSONException {
         ArrayList<String> options = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            options.add(jsonArray.getJSONObject(i).getString("option"));
+            // TODO: take value and label from json it's temp to take value just to see code works
+            options.add(jsonArray.getJSONObject(i).getString("value"));
         }
 
         return options;
@@ -148,7 +132,7 @@ public class JsonReader {
     private void insertInDatabase() {
         DbDataSource dbDataSource = new DbDataSource(context);
         dbDataSource.open();
-        dbDataSource.insertJSON(sections);
+        dbDataSource.insertJSON(pages);
         dbDataSource.close();
     }
 }

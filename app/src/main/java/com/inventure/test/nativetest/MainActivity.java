@@ -23,7 +23,6 @@ import com.inventure.test.nativetest.parser.JsonReader;
 import com.inventure.test.nativetest.testUtil.JsonCreator;
 import com.inventure.test.nativetest.util.ServerDecision;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,7 +63,7 @@ public class MainActivity extends Activity implements
             @Override
             public void onSuccess(LoginResult loginResult) {
                 finish();
-                Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
+                Intent questionnaire = new Intent(getBaseContext(), SurveyActivity.class);
                 startActivity(questionnaire);
             }
 
@@ -97,13 +96,15 @@ public class MainActivity extends Activity implements
 
         // Reads data from test json and load it into database
         try {
-            JSONObject jsonObject = JsonCreator.getJson();
-            JSONArray jsonArray = jsonObject.getJSONArray("section");
+            JSONObject jsonObjectData = JsonCreator.getJson();
+            JSONObject jsonObjectContent = jsonObjectData.getJSONObject("content");
+
             JsonReader jsonReader = new JsonReader(this);
-            jsonReader.readDataFromJSON(jsonArray);
+            jsonReader.readDataFromJSON(jsonObjectContent.getJSONArray("pages"));
 
             finish();
-            ServerDecision.launchActivity(jsonObject.getString("type"), this);
+            //TODO: get show confirmation out and store it in shared preferrence
+            ServerDecision.launchActivity(jsonObjectData.getString("type"), this);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -163,7 +164,7 @@ public class MainActivity extends Activity implements
         // establish a service connection to Google Play services.
         mShouldResolve = false;
         finish();
-        Intent questionnaire = new Intent(getBaseContext(), QuestionnaireActivity.class);
+        Intent questionnaire = new Intent(getBaseContext(), SurveyActivity.class);
         startActivity(questionnaire);
     }
 

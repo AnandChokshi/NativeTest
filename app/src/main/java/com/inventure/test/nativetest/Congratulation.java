@@ -1,12 +1,12 @@
 package com.inventure.test.nativetest;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class Congratulation extends ActionBarActivity {
+public class Congratulation extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
