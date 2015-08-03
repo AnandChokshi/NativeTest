@@ -40,11 +40,10 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     // Options table Columns
     public static final String OPTIONS_ID = "options_id";
-    public static final String OPTION = "option";
+    public static final String VALUE = "value";
 
     // Default Values table Columns
     public static final String DEFAULT_VALUES_ID = "default_values_id";
-    public static final String VALUE = "value";
 
     // Validation table Columns
     public static final String VALIDATION_ID = "validation_id";
@@ -78,7 +77,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + OPTIONS_TABLE_NAME + " (" +
                     OPTIONS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     QUESTIONS_ID + " INTEGER, " +
-                    OPTION + " TEXT, " +
+                    LABEL + " TEXT, " +
+                    VALUE + " TEXT, " +
                     "FOREIGN KEY(" + QUESTIONS_ID + ") REFERENCES " + QUESTIONS_TABLE_NAME + "(" + QUESTIONS_ID + "))";
     private static final String DEFAULT_VALUES_TABLE_CREATE =
             "CREATE TABLE " + DEFAULT_VALUES_TABLE_NAME + " (" +

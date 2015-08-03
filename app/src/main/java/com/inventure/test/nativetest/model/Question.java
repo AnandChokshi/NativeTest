@@ -14,7 +14,7 @@ public class Question {
     private String placeHolder;
     private ArrayList<String> defaultValues = new ArrayList<>();
     private Validation validation;
-    private ArrayList<String> options;
+    private ArrayList<Option> options;
 
     public int getQuestion_id() {
         return question_id;
@@ -80,11 +80,11 @@ public class Question {
         this.validation = validation;
     }
 
-    public ArrayList<String> getOptions() {
+    public ArrayList<Option> getOptions() {
         return options;
     }
 
-    public void setOptions(ArrayList<String> options) {
+    public void setOptions(ArrayList<Option> options) {
         this.options = options;
     }
 }

@@ -1,6 +1,7 @@
 package com.inventure.test.nativetest;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -47,9 +48,15 @@ public class MainActivity extends Activity implements
     private CallbackManager callbackManager;
     LoginButton loginFB;
 
+    // TEST CODE
+    JSONObject answer;
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
 
         // Initialize Facebook
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -92,6 +99,36 @@ public class MainActivity extends Activity implements
         findViewById(R.id.sign_in_button).setOnClickListener(this);
 
         // ----------------- Google Ends --------------------
+
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    String jsonToSend = "{\"data\":{\"device\":{\"android_id\":\"9822197841fadd0c\",\"device_id\":\"354068063926074\",\"version\":\"3.5\"},\"auth\":{\"data\":{\"id\":\"836043463111397\",\"first_name\":\"Bob\",\"timezone\":-7,\"email\":\"ldttestaccount3@gmail.com\",\"verified\":true,\"name\":\"Bob   Letsdo\",\"locale\":\"en_GB\",\"link\":\"https:\\/\\/www.facebook.com\\/app_scoped_user_id\\/836043463111397\\/\",\"last_name\":\"Letsdo\",\"gender\":\"male\",\"updated_time\":\"2015-03-26T19:28:26+0000\"},\"type\":\"FB\",\"app_id\":\"933613079993549\",\"access_token\":\"CAANRHbv9nM0BAKwAcWTZB784y8C7sb0ZBJDlgdiYe4eeZCdHa413LVfZBZC50buN7eR0djNYdJov2Do1lZCqv4dQIOZAp2BgDNmphHY7ZAoPRTngSTsLICsOZCwImsv5brjZBSrZBrTHJ9B0kGZAVJvqy1bHeCNejG3FfPVyO51FHbe5OjrMkKgVFQooUZCYTdtVd5KXmFtHmknF5G8dZB7p0pJ0l8\"},\"country\":\"KE\"}}";
+//                    HTTPNoCompression httpNoCompression = new HTTPNoCompression();
+//                    answer = httpNoCompression.sendDataToInventure(jsonToSend, "http://devapi.inventureaccess.com/android/login");
+//
+//                    JSONObject jsonObjectData = answer.getJSONObject("data");
+//                    JSONObject jsonObjectContent = jsonObjectData.getJSONObject("content");
+//
+//                    JsonReader jsonReader = new JsonReader(context);
+//                    jsonReader.readDataFromJSON(jsonObjectContent.getJSONArray("pages"));
+//
+//                    SharedPreferences.Editor editor = getSharedPreferences("session", MODE_PRIVATE).edit();
+//                    editor.putString("id", answer.getString("session_id"));
+//                    editor.commit();
+//
+//                    finish();
+//                    //TODO: get show confirmation out and store it in shared preferrence
+//                    ServerDecision.launchActivity(jsonObjectData.getString("type"), context);
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        thread.start();
 
 
         // Reads data from test json and load it into database

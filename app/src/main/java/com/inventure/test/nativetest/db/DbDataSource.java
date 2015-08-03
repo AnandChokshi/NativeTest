@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.inventure.test.nativetest.model.Condition;
+import com.inventure.test.nativetest.model.Option;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
@@ -69,7 +70,7 @@ public class DbDataSource {
 
         for (Condition condition : conditions) {
             contentValues.put(DbOpenHelper.PAGE_ID, id);
-            contentValues.put(DbOpenHelper.QUESTIONS_SERVER_ID, condition.getQid());
+            contentValues.put(DbOpenHelper.QUESTIONS_SERVER_ID, condition.getQuestion_server_id());
             contentValues.put(DbOpenHelper.ANSWER, condition.getAnswer());
 
             sqLiteDatabase.insert(DbOpenHelper.PAGE_CONDITION_TABLE_NAME, null, contentValues);
@@ -141,12 +142,13 @@ public class DbDataSource {
     }
 
     // Insert options if available
-    private void insertOptions(Long que_id, ArrayList<String> options) {
+    private void insertOptions(Long que_id, ArrayList<Option> options) {
         ContentValues contentValues = new ContentValues();
 
-        for (String option : options) {
+        for (Option option : options) {
             contentValues.put(DbOpenHelper.QUESTIONS_ID, que_id);
-            contentValues.put(DbOpenHelper.OPTION, option);
+            contentValues.put(DbOpenHelper.LABEL, option.getLabel());
+            contentValues.put(DbOpenHelper.VALUE, option.getValue());
 
             sqLiteDatabase.insert(DbOpenHelper.OPTIONS_TABLE_NAME, null, contentValues);
 
@@ -275,14 +277,19 @@ public class DbDataSource {
         question.setValidation(validation);
 
         // Get Options
-        query = "SELECT " + DbOpenHelper.OPTION + " FROM " +
+        query = "SELECT * FROM " +
                 DbOpenHelper.OPTIONS_TABLE_NAME + " WHERE " +
                 DbOpenHelper.QUESTIONS_ID + " = " + question.getQuestion_id();
         cursorInside = sqLiteDatabase.rawQuery(query, null);
-        ArrayList<String> options = new ArrayList<>();
+        ArrayList<Option> options = new ArrayList<>();
+        Option option;
 
         while (cursorInside.moveToNext()) {
-            options.add(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.OPTION)));
+            option = new Option();
+            option.setLabel(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.LABEL)));
+            option.setValue(cursorInside.getString(cursorInside.getColumnIndex(DbOpenHelper.VALUE)));
+
+            options.add(option);
         }
         question.setOptions(options);
         cursorInside.close();

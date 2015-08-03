@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.inventure.test.nativetest.db.DbDataSource;
 import com.inventure.test.nativetest.model.Condition;
+import com.inventure.test.nativetest.model.Option;
 import com.inventure.test.nativetest.model.Page;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
@@ -25,6 +26,8 @@ public class JsonReader {
     public JsonReader(Context context) {
         this.context = context;
     }
+
+    // TODO: handle all the null before fatching data from json
 
     /*
     Name of the tags are hardcoded right now for ease of use
@@ -54,7 +57,7 @@ public class JsonReader {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             condition = new Condition();
-            condition.setQid(jsonArray.getJSONObject(i).getString("qid"));
+            condition.setQuestion_server_id(jsonArray.getJSONObject(i).getString("qid"));
             condition.setAnswer(jsonArray.getJSONObject(i).getString("answer"));
             conditions.add(condition);
         }
@@ -70,10 +73,6 @@ public class JsonReader {
             JSONObject object = jsonArray.getJSONObject(i);
             String type = object.getString("type");
 
-            // TO DO: do something for plaintext
-            if (type.equals("plainText"))
-                continue;
-
             question.setType(type);
             question.setQuestion_server_id(object.getString("question_server_id"));
             question.setLabel(object.getString("label"));
@@ -81,8 +80,10 @@ public class JsonReader {
             if (type.equals(QuestionType.TEXT_BOX) || type.equals(QuestionType.TEXT_AREA))
                 question.setPlaceHolder(object.getString("placeholder"));
 
-            if (object.getJSONArray("default").length() > 0) {
-                question.setDefaultValues(readDefaultValues(object.getJSONArray("default")));
+            if (!object.isNull("default")) {
+                if (object.getJSONArray("default").length() > 0) {
+                    question.setDefaultValues(readDefaultValues(object.getJSONArray("default")));
+                }
             }
 
             question.setValidation(readValidationValues(object.getJSONObject("validation")));
@@ -110,7 +111,8 @@ public class JsonReader {
     private Validation readValidationValues(JSONObject jsonObject) throws JSONException {
         Validation validation = new Validation();
         validation.setRequired(jsonObject.getInt("required"));
-        validation.setServer_validation(jsonObject.getInt("server_validation"));
+        if (!jsonObject.isNull("server_validation"))
+            validation.setServer_validation(jsonObject.getInt("server_validation"));
         validation.setValidation_type(jsonObject.getString("type"));
         validation.setRegex(jsonObject.getString("regex"));
         validation.setError_message(jsonObject.getString("error_message"));
@@ -119,11 +121,14 @@ public class JsonReader {
     }
 
     // Read Options data
-    private ArrayList<String> readFromOptions(JSONArray jsonArray) throws JSONException {
-        ArrayList<String> options = new ArrayList<>();
+    private ArrayList<Option> readFromOptions(JSONArray jsonArray) throws JSONException {
+        ArrayList<Option> options = new ArrayList<>();
+        Option option;
         for (int i = 0; i < jsonArray.length(); i++) {
-            // TODO: take value and label from json it's temp to take value just to see code works
-            options.add(jsonArray.getJSONObject(i).getString("value"));
+            option = new Option();
+            option.setValue(jsonArray.getJSONObject(i).getString("value"));
+            option.setLabel(jsonArray.getJSONObject(i).getString("label"));
+            options.add(option);
         }
 
         return options;

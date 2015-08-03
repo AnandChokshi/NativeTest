@@ -54,13 +54,15 @@ public class HTTPNoCompression {
 
     private String responseDataString = null;
 
+    private JSONObject serverResponseJson;
+
     public String getB64Auth(String login, String password) {
         String source = login + ":" + password;
         String authorizationString = "Basic " + Base64.encodeToString(source.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
         return authorizationString;
     }
 
-    public boolean sendDataToInventure(String inputJsonEncodedData, String targetHost) {
+    public JSONObject sendDataToInventure(String inputJsonEncodedData, String targetHost) {
         // JSON encoded data to be sent to InVenture
         boolean sentSuccessful = false;
         String dataContent = inputJsonEncodedData;
@@ -95,17 +97,10 @@ public class HTTPNoCompression {
             if (responseCode == 200) {
                 try {
                     // decode the response JSON
-                    JSONObject serverResponseJson = new JSONObject(serverResponse);
-                    String responseStatusString = serverResponseJson.getString("status");
 
-                    // get the response data string
-                    responseDataString = serverResponseJson.getString("data");
+                    serverResponse = serverResponse.replaceAll(String.valueOf("<response>"), "");
+                    serverResponseJson = new JSONObject(serverResponse);
 
-                    if (responseStatusString.equalsIgnoreCase("success")) {
-                        sentSuccessful = true;
-                    } else {
-                        sentSuccessful = false;
-                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -120,7 +115,7 @@ public class HTTPNoCompression {
             e.printStackTrace();
         }
 
-        return sentSuccessful;
+        return serverResponseJson;
     }
 
     //    HttpURLConnection

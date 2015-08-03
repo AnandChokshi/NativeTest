@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.inventure.test.nativetest.model.Option;
 import com.inventure.test.nativetest.model.Question;
 import com.inventure.test.nativetest.model.Validation;
 
@@ -42,6 +43,9 @@ public class UIHelper {
         this.questions = questions;
         this.linearLayout = linearLayout;
     }
+
+    // TODO: handle regex as well as server validation
+    // TODO: Load the answer and defualt if exists
 
     public void loadView() {
         int position = 0;
@@ -76,9 +80,11 @@ public class UIHelper {
 
     private void makeTextView(Question question, LinearLayout linearLayout) {
         //Initialize TextView
-        TextView textView = new TextView(context);
-        textView.setText(question.getLabel());
-        linearLayout.addView(textView);
+        if (question.getLabel() != null && !question.getLabel().equals("null")) {
+            TextView textView = new TextView(context);
+            textView.setText(question.getLabel());
+            linearLayout.addView(textView);
+        }
     }
 
     private void makeTextBox(LinearLayout linearLayout, int position, String type) {
@@ -103,14 +109,14 @@ public class UIHelper {
         RadioGroup radioGroup = new RadioGroup(context);
         radioGroup.setOrientation(RadioGroup.VERTICAL);
 
-        ArrayList<String> radioButtonOptions = question.getOptions();
+        ArrayList<Option> radioButtonOptions = question.getOptions();
 
         // Create radioButtons based on options
-        for (String radio : radioButtonOptions) {
+        for (Option radio : radioButtonOptions) {
             RadioButton radioTemp = new RadioButton(context);
-            radioTemp.setText(radio);
+            radioTemp.setText(radio.getLabel());
             radioTemp.setId(id_counter_radio * 100);
-            if (question.getAnswer().equals(radio))
+            if (question.getAnswer().equals(radio.getValue()))
                 radioTemp.setChecked(true);
 
             radioGroup.addView(radioTemp);
@@ -124,19 +130,19 @@ public class UIHelper {
 
     private void makeCheckBox(Question question, LinearLayout linearLayout, int position) {
         sb = new StringBuilder();
-        ArrayList<String> checkBoxOptions = question.getOptions();
+        ArrayList<Option> checkBoxOptions = question.getOptions();
         // Initialize CheckBoxes
         CheckBox temp;
-        String value;
+        Option option;
         CustomCheckboxChangedListener customCheckboxChangedListener;
         for (int i = 0; i < checkBoxOptions.size(); i++) {
-            value = checkBoxOptions.get(i);
-            customCheckboxChangedListener = new CustomCheckboxChangedListener(position, value);
+            option = checkBoxOptions.get(i);
+            customCheckboxChangedListener = new CustomCheckboxChangedListener(position, option);
             temp = new CheckBox(context);
-            temp.setText(value);
+            temp.setText(option.getLabel());
             temp.setOnCheckedChangeListener(customCheckboxChangedListener);
-            getCheckedCheckbox(position, value, temp.isChecked());
-            if (question.getAnswer().contains(value))
+            getCheckedCheckbox(position, option, temp.isChecked());
+            if (question.getAnswer().contains(option.getValue()))
                 temp.setChecked(true);
             linearLayout.addView(temp);
         }
@@ -177,7 +183,7 @@ public class UIHelper {
         CustomOnItemSelectedListener customOnItemSelectedListener = new CustomOnItemSelectedListener(position);
         spinner.setOnItemSelectedListener(customOnItemSelectedListener);
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context,
+        ArrayAdapter<Option> arrayAdapter = new ArrayAdapter<>(context,
                 android.R.layout.simple_spinner_item, question.getOptions());
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
@@ -224,24 +230,25 @@ public class UIHelper {
     // Get the checked radio button ID
     private void getCheckRadioButton(int position, RadioGroup group, int checkedId) {
         RadioButton radioButton = (RadioButton) group.findViewById(checkedId);
+        checkedId = checkedId / 100;
         if (radioButton != null) {
-            questions.get(position).setAnswer(radioButton.getText().toString());
+            questions.get(position).setAnswer(questions.get(position).getOptions().get(checkedId - 1).getValue());
         }
     }
 
     // To Store answer of Checkbox
     private class CustomCheckboxChangedListener implements CheckBox.OnCheckedChangeListener {
         private int position;
-        private String value;
+        private Option option;
 
-        private CustomCheckboxChangedListener(int position, String value) {
+        private CustomCheckboxChangedListener(int position, Option option) {
             this.position = position;
-            this.value = value;
+            this.option = option;
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            getCheckedCheckbox(position, value, isChecked);
+            getCheckedCheckbox(position, option, isChecked);
         }
     }
 
@@ -311,7 +318,8 @@ public class UIHelper {
     }
 
     // Get the checked checkbox value
-    private void getCheckedCheckbox(int position, String value, boolean isChecked) {
+    private void getCheckedCheckbox(int position, Option option, boolean isChecked) {
+        String value = option.getValue();
         if (isChecked) {
             sb.append("(" + value + ")");
         } else {
@@ -331,7 +339,8 @@ public class UIHelper {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            questions.get(this.position).setAnswer(parent.getItemAtPosition(position).toString());
+            Option option = (Option) parent.getItemAtPosition(position);
+            questions.get(this.position).setAnswer(option.getValue());
         }
 
         @Override
