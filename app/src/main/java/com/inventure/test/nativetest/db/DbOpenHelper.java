@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DbOpenHelper extends SQLiteOpenHelper {
 
+    // TODO: create people table and populate it based on the data we got from questions => session_id, full name, Device id, phone num, email address
+
     // db name
     private static final String DB_NAME = "native.db";
 

@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +29,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Anand on 6/22/2015.
@@ -44,8 +47,8 @@ public class UIHelper {
         this.linearLayout = linearLayout;
     }
 
-    // TODO: handle regex as well as server validation
-    // TODO: Load the answer and defualt if exists
+    // TODO: handle server validation
+    // TODO: Load the answer and defualt if exists implement after review page so test become easy
 
     public void loadView() {
         int position = 0;
@@ -92,6 +95,12 @@ public class UIHelper {
         EditText editText = new EditText(context);
         editText.setLongClickable(false);
 
+        String validation_type = questions.get(position).getValidation().getValidation_type();
+        try {
+            editText.setInputType(Integer.parseInt(validation_type));
+        } catch (NumberFormatException e) {
+            Log.d("TEST", e.getMessage());
+        }
         // set properties according to Edit text type
         if (type.equals("textbox"))
             editText.setSingleLine(true);
@@ -352,6 +361,8 @@ public class UIHelper {
     // Check required conditions
     public boolean validationCheck() {
         Validation validation;
+        Pattern pattern;
+        Matcher matcher;
         for (Question question : questions) {
             validation = question.getValidation();
             if (validation.getRequired() == 1) {
@@ -360,10 +371,14 @@ public class UIHelper {
                     return false;
                 }
             }
-            //----------check for regex here-----
-            //
-            //
-            //-----------------------------------
+            if (validation.getRegex() != null && !validation.getRegex().equals("null")) {
+                pattern = Pattern.compile(validation.getRegex());
+                matcher = pattern.matcher(question.getAnswer());
+                if (!matcher.matches()) {
+                    Toast.makeText(context, question.getLabel() + " Invalid Input", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
         }
 
         return true;

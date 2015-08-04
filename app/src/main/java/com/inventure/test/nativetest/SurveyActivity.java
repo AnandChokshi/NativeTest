@@ -51,6 +51,7 @@ public class SurveyActivity extends AppCompatActivity {
         page = dbDataSource.readPage();
         if (page.getQuestions() == null) {
             // TODO: check confirmation if set then go to review screen otherwise send data to server
+            // TODO: clear the DB after sending data to server
             Toast.makeText(this, "End of page", Toast.LENGTH_LONG).show();
 
 //            SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);

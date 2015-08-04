@@ -16,6 +16,8 @@ public class ServerDecision {
         Intent startNewActivity;
         switch (type) {
             case ActivityTypes.SURVEY:
+                // TODO: Compare the old data with new json if exists in DB
+                // TODO: store the hash of the json in DB
                 startNewActivity = new Intent(context, SurveyActivity.class);
                 context.startActivity(startNewActivity);
                 break;

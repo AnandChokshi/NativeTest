@@ -28,11 +28,8 @@ public class JsonReader {
     }
 
     // TODO: handle all the null before fatching data from json
+   // TODO: Name of the tags are hardcoded right now for ease of use as this is not the final version
 
-    /*
-    Name of the tags are hardcoded right now for ease of use
-    as this is not the final version
-     */
     public void readDataFromJSON(JSONArray jsonArray) throws JSONException {
         pages = new ArrayList<>();
         Page page;
@@ -57,7 +54,7 @@ public class JsonReader {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             condition = new Condition();
-            condition.setQuestion_server_id(jsonArray.getJSONObject(i).getString("qid"));
+            condition.setQuestion_server_id(jsonArray.getJSONObject(i).getString("question_server_id"));
             condition.setAnswer(jsonArray.getJSONObject(i).getString("answer"));
             conditions.add(condition);
         }

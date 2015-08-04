@@ -20,11 +20,7 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
-import com.inventure.test.nativetest.parser.JsonReader;
-import com.inventure.test.nativetest.testUtil.JsonCreator;
-import com.inventure.test.nativetest.util.ServerDecision;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -119,7 +115,7 @@ public class MainActivity extends Activity implements
 //                    editor.commit();
 //
 //                    finish();
-//                    //TODO: get show confirmation out and store it in shared preferrence
+//                    //TODO: get show confirmation out and store it in shared preference
 //                    ServerDecision.launchActivity(jsonObjectData.getString("type"), context);
 //
 //                } catch (Exception e) {
@@ -130,21 +126,21 @@ public class MainActivity extends Activity implements
 //
 //        thread.start();
 
-
-        // Reads data from test json and load it into database
-        try {
-            JSONObject jsonObjectData = JsonCreator.getJson();
-            JSONObject jsonObjectContent = jsonObjectData.getJSONObject("content");
-
-            JsonReader jsonReader = new JsonReader(this);
-            jsonReader.readDataFromJSON(jsonObjectContent.getJSONArray("pages"));
-
-            finish();
-            //TODO: get show confirmation out and store it in shared preferrence
-            ServerDecision.launchActivity(jsonObjectData.getString("type"), this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//
+//        // Reads data from test json and load it into database
+//        try {
+//            JSONObject jsonObjectData = JsonCreator.getJson();
+//            JSONObject jsonObjectContent = jsonObjectData.getJSONObject("content");
+//
+//            JsonReader jsonReader = new JsonReader(this);
+//            jsonReader.readDataFromJSON(jsonObjectContent.getJSONArray("pages"));
+//
+//            finish();
+//            //TODO: get show confirmation out and store it in shared preferrence
+//            ServerDecision.launchActivity(jsonObjectData.getString("type"), this);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
     // Facebook Login Button Call Back
